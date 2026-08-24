@@ -1,0 +1,2804 @@
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+}
+
+html{
+    -webkit-text-size-adjust:100%;
+    touch-action:manipulation;
+}
+
+body{
+
+    font-family:'Fredoka',sans-serif;
+
+    background-image:url("assets/images/background.png");
+
+    background-size:cover;
+
+    background-position:center;
+
+    background-repeat:no-repeat;
+
+    background-attachment:fixed;
+
+    min-height:100vh;
+
+    overflow-y:auto;
+    overflow-x:hidden;
+
+    -webkit-tap-highlight-color:transparent;
+}
+
+
+/* =========================================
+   IPAD / TOUCH
+========================================= */
+
+button,
+a,
+input,
+select{
+    touch-action:manipulation;
+}
+
+button{
+    -webkit-user-select:none;
+    user-select:none;
+}
+
+.hidden-screen{
+
+    display:none !important;
+
+    visibility:hidden !important;
+
+}
+
+
+/* =========================================
+   DOJO MART ENTRANCE
+========================================= */
+
+.welcome-screen{
+
+    min-height:100vh;
+
+    width:100%;
+
+    display:flex;
+
+    align-items:center;
+
+    justify-content:center;
+
+    padding:30px;
+
+    text-align:center;
+
+}
+
+
+.dojo-store-entrance{
+
+    width:min(760px,95vw);
+
+    display:flex;
+
+    flex-direction:column;
+
+    align-items:center;
+
+}
+
+
+/* =========================================
+   STORE SIGN
+========================================= */
+
+.dojo-store-sign{
+
+    display:flex;
+
+    align-items:center;
+
+    justify-content:center;
+
+    gap:18px;
+
+    background:linear-gradient(
+        135deg,
+        #5d21b6,
+        #8c42e8,
+        #c23cff
+    );
+
+    border:5px solid #ffd43b;
+
+    border-radius:28px 28px 18px 18px;
+
+    padding:18px 32px;
+
+    box-shadow:
+        0 8px 0 #4b1a93,
+        0 15px 30px rgba(0,0,0,.25);
+
+    position:relative;
+
+    z-index:4;
+
+}
+
+
+.dojo-store-name{
+
+    color:white;
+
+    font-size:clamp(2.5rem,7vw,4.7rem);
+
+    line-height:.85;
+
+    font-weight:700;
+
+    letter-spacing:1px;
+
+    text-shadow:
+        0 4px 0 #4f1a92,
+        0 0 15px rgba(255,255,255,.3);
+
+}
+
+
+.dojo-store-name span{
+
+    display:block;
+
+    color:#ffd43b;
+
+}
+
+
+.store-star{
+
+    font-size:2.2rem;
+
+    animation:starFloat 2.2s infinite ease-in-out;
+
+}
+
+
+.store-star:last-child{
+
+    animation-delay:.5s;
+
+}
+
+
+/* =========================================
+   STORE BUILDING
+========================================= */
+
+.dojo-store-building{
+
+    position:relative;
+
+    width:min(650px,94vw);
+
+    padding:20px 22px 35px;
+
+    border-radius:30px 30px 25px 25px;
+
+    background:linear-gradient(
+        145deg,
+        #9f56e9,
+        #7b35c8
+    );
+
+    border:6px solid #6a28a9;
+
+    box-shadow:
+        0 14px 0 #4d177d,
+        0 25px 35px rgba(0,0,0,.24);
+
+}
+
+
+/* =========================================
+   AWNING
+========================================= */
+
+.dojo-awning{
+
+    display:grid;
+
+    grid-template-columns:
+        repeat(6,1fr);
+
+    overflow:hidden;
+
+    border-radius:18px 18px 8px 8px;
+
+    border:4px solid white;
+
+    box-shadow:
+        0 5px 12px rgba(0,0,0,.18);
+
+    margin-bottom:18px;
+
+}
+
+
+.dojo-awning span{
+
+    height:34px;
+
+    background:#fff;
+
+}
+
+
+.dojo-awning span:nth-child(even){
+
+    background:#ff5bbd;
+
+}
+
+
+/* =========================================
+   DOORS
+========================================= */
+
+.dojo-door-area{
+
+    position:relative;
+
+    height:430px;
+
+    overflow:hidden;
+
+    border-radius:24px;
+
+    border:6px solid #4d177d;
+
+    background:#26133c;
+
+    box-shadow:
+        inset 0 0 30px rgba(0,0,0,.35);
+
+}
+
+
+.dojo-inside{
+
+    position:absolute;
+
+    inset:0;
+
+    display:flex;
+
+    flex-direction:column;
+
+    align-items:center;
+
+    justify-content:center;
+
+    background:
+        radial-gradient(
+            circle,
+            #ffde66 0%,
+            #f6a8ff 32%,
+            #9c50f1 65%,
+            #4d1890 100%
+        );
+
+}
+
+
+.welcome-shopper-text{
+
+    color:#6023a8;
+
+    font-size:clamp(2rem,6vw,3.6rem);
+
+    line-height:.95;
+
+    font-weight:700;
+
+    text-shadow:
+        0 3px white;
+
+}
+
+
+.welcome-shopper-text span{
+
+    display:block;
+
+    margin-top:18px;
+
+    color:#ff3fae;
+
+    font-size:.55em;
+
+}
+
+
+.inside-star{
+
+    margin-top:25px;
+
+    font-size:5.5rem;
+
+    filter:
+        drop-shadow(0 0 15px #fff);
+
+}
+
+
+.inside-sparkles{
+
+    margin-top:12px;
+
+    font-size:1.5rem;
+
+}
+
+
+/* =========================================
+   INDIVIDUAL DOORS
+========================================= */
+
+.dojo-door{
+
+    position:absolute;
+
+    top:0;
+
+    bottom:0;
+
+    width:50%;
+
+    border:none;
+
+    cursor:pointer;
+
+    z-index:3;
+
+    background:
+        linear-gradient(
+            135deg,
+            #7b30d4,
+            #5e1eaa
+        );
+
+    border:5px solid #40116a;
+
+    transition:
+        transform .95s cubic-bezier(.68,-.1,.25,1),
+        box-shadow .3s;
+
+    display:flex;
+
+    flex-direction:column;
+
+    align-items:center;
+
+    justify-content:center;
+
+    min-height:60px;
+
+}
+
+
+.dojo-door-left{
+
+    left:0;
+
+    transform-origin:left center;
+
+}
+
+
+.dojo-door-right{
+
+    right:0;
+
+    left:auto;
+
+    transform-origin:right center;
+
+    z-index:4;
+
+}
+
+
+.door-window{
+
+    width:155px;
+
+    height:145px;
+
+    border-radius:22px;
+
+    border:5px solid #ffd43b;
+
+    background:
+        linear-gradient(
+            135deg,
+            #a752ee,
+            #ff65c8
+        );
+
+    box-shadow:
+        inset 0 0 20px rgba(255,255,255,.25),
+        0 0 12px rgba(255,212,59,.3);
+
+    display:flex;
+
+    align-items:center;
+
+    justify-content:center;
+
+    margin-bottom:25px;
+
+}
+
+
+.door-window-glow{
+
+    font-size:4rem;
+
+    filter:
+        drop-shadow(0 0 10px #fff);
+
+}
+
+
+.door-name{
+
+    color:#fff;
+
+    font-size:2rem;
+
+    font-weight:700;
+
+    letter-spacing:2px;
+
+    text-shadow:
+        0 3px #46167d;
+
+}
+
+
+.door-handle{
+
+    position:absolute;
+
+    top:52%;
+
+    width:19px;
+
+    height:19px;
+
+    border-radius:50%;
+
+    background:#ffd43b;
+
+    color:#8c5c00;
+
+    font-size:.7rem;
+
+    display:flex;
+
+    align-items:center;
+
+    justify-content:center;
+
+    box-shadow:
+        0 2px 4px rgba(0,0,0,.35);
+
+}
+
+
+.dojo-door-left .door-handle{
+
+    right:20px;
+
+}
+
+
+.dojo-door-right .door-handle{
+
+    left:20px;
+
+}
+
+
+/* =========================================
+   OPEN DOORS
+========================================= */
+
+.dojo-door-area.doors-open
+.dojo-door-left{
+
+    transform:
+        perspective(900px)
+        rotateY(-82deg);
+
+}
+
+
+.dojo-door-area.doors-open
+.dojo-door-right{
+
+    transform:
+        perspective(900px)
+        rotateY(82deg);
+
+}
+
+
+/* =========================================
+   FRONT LIGHTS
+========================================= */
+
+.store-front-lights{
+
+    color:#ffd43b;
+
+    font-size:1.6rem;
+
+    letter-spacing:12px;
+
+    margin-top:18px;
+
+}
+
+
+/* =========================================
+   MAT
+========================================= */
+
+.dojo-welcome-mat{
+
+    display:inline-block;
+
+    margin-top:15px;
+
+    background:#5b1b91;
+
+    border:3px solid #ffd43b;
+
+    border-radius:15px;
+
+    padding:10px 25px;
+
+    color:white;
+
+    font-size:1rem;
+
+    font-weight:700;
+
+    box-shadow:
+        0 4px 0 #40116a;
+
+}
+
+
+/* =========================================
+   DOOR INSTRUCTIONS
+========================================= */
+
+.dojo-door-instruction{
+
+    margin-top:28px;
+
+    color:white;
+
+    font-size:1.65rem;
+
+    font-weight:700;
+
+    text-shadow:
+        0 3px 10px rgba(0,0,0,.3);
+
+}
+
+
+.dojo-door-subtext{
+
+    margin-top:8px;
+
+    color:#ffdff5;
+
+    font-size:1.05rem;
+
+}
+
+
+/* =========================================
+   STUDENT SCREEN
+========================================= */
+
+#studentScreen{
+
+    flex-direction:column;
+
+    align-items:center;
+
+    min-height:100vh;
+
+    padding:40px 20px 200px;
+
+}
+
+
+.student-screen-header{
+
+    text-align:center;
+
+}
+
+
+.student-screen-rainbow{
+
+    font-size:3rem;
+
+}
+
+
+.welcome-back{
+
+    color:white;
+
+    font-size:3rem;
+
+    margin-bottom:10px;
+
+    text-shadow:
+        0 0 15px rgba(255,255,255,.6);
+
+}
+
+
+.choose-text{
+
+    color:white;
+
+    font-size:1.4rem;
+
+    text-align:center;
+
+    margin-bottom:45px;
+
+    line-height:1.6;
+
+}
+
+
+.student-grid{
+
+    display:grid;
+
+    grid-template-columns:
+        repeat(3,minmax(0,300px));
+
+    gap:30px;
+
+    justify-content:center;
+
+    width:100%;
+
+    margin:40px auto 80px;
+
+}
+
+
+.student-bubble{
+
+    width:100%;
+
+    min-height:360px;
+
+    border:none;
+
+    background:rgba(255,255,255,.92);
+
+    border-radius:30px;
+
+    display:flex;
+
+    flex-direction:column;
+
+    align-items:center;
+
+    justify-content:center;
+
+    gap:22px;
+
+    cursor:pointer;
+
+    padding:25px;
+
+    box-shadow:
+        0 8px 20px rgba(0,0,0,.15);
+
+    transition:
+        transform .18s ease,
+        box-shadow .18s ease;
+
+}
+
+
+.student-bubble span{
+
+    color:#6a2ab4;
+
+    font-size:1.1rem;
+
+    font-weight:700;
+
+}
+
+
+.student-photo{
+
+    width:210px;
+
+    height:210px;
+
+    object-fit:contain;
+
+    display:block;
+
+    border-radius:50%;
+
+}
+
+
+/* =========================================
+   HOME
+========================================= */
+
+#homeScreen{
+
+    display:none;
+
+    flex-direction:column;
+
+    align-items:center;
+
+    min-height:100vh;
+
+    padding:50px 20px;
+
+}
+
+
+.points-card{
+
+    background:white;
+
+    border-radius:30px;
+
+    padding:30px;
+
+    width:320px;
+
+    text-align:center;
+
+    box-shadow:
+        0 10px 25px rgba(0,0,0,.25);
+
+    margin:35px 0;
+
+}
+
+
+.points-card h3{
+
+    color:#7b3ff2;
+
+    font-size:1.5rem;
+
+    margin-bottom:20px;
+
+}
+
+
+.points-number{
+
+    font-size:3rem;
+
+    font-weight:bold;
+
+    color:#ffb400;
+
+}
+
+
+.home-buttons{
+
+    display:flex;
+
+    flex-direction:column;
+
+    gap:20px;
+
+    width:320px;
+
+}
+
+
+.home-buttons button{
+
+    border:none;
+
+    border-radius:20px;
+
+    padding:18px;
+
+    min-height:58px;
+
+    font-size:1.3rem;
+
+    font-family:'Fredoka',sans-serif;
+
+    cursor:pointer;
+
+    background:white;
+
+}
+
+
+.back-button{
+
+    margin-top:40px;
+
+    border:none;
+
+    background:#7b3ff2;
+
+    color:white;
+
+    border-radius:18px;
+
+    padding:14px 35px;
+
+    min-height:56px;
+
+    font-size:1.1rem;
+
+    cursor:pointer;
+
+}
+
+
+/* =========================================
+   SHOP
+========================================= */
+
+#shopScreen{
+
+    display:none;
+
+    flex-direction:column;
+
+    align-items:center;
+
+    min-height:100vh;
+
+    padding:50px 20px 150px;
+
+}
+
+
+.shop-category{
+
+    color:white;
+
+    font-size:2rem;
+
+    margin:45px 0 25px;
+
+    text-align:center;
+
+}
+
+
+.shop-grid{
+
+    display:grid;
+
+    grid-template-columns:
+        repeat(3,1fr);
+
+    gap:25px;
+
+    width:100%;
+
+    max-width:1100px;
+
+    justify-items:center;
+
+}
+
+
+.reward-card{
+
+    width:260px;
+
+    min-height:300px;
+
+    background:white;
+
+    border-radius:30px;
+
+    padding:25px;
+
+    display:flex;
+
+    flex-direction:column;
+
+    align-items:center;
+
+    justify-content:center;
+
+    text-align:center;
+
+    box-shadow:
+        0 12px 25px rgba(0,0,0,.25);
+
+    transition:
+        transform .2s ease,
+        box-shadow .2s ease;
+
+}
+
+
+.reward-image{
+
+    font-size:5rem;
+
+    margin-bottom:15px;
+
+}
+
+
+.reward-image img{
+
+    width:70px;
+
+    height:70px;
+
+    object-fit:contain;
+
+}
+
+
+.reward-card h3{
+
+    color:#7b3ff2;
+
+    font-size:1.3rem;
+
+    margin-bottom:10px;
+
+}
+
+
+.reward-card p{
+
+    color:#555;
+
+    font-size:1.1rem;
+
+    font-weight:bold;
+
+    margin-bottom:15px;
+
+}
+
+
+.buy-btn{
+
+    border:none;
+
+    background:#7b3ff2;
+
+    color:white;
+
+    font-family:'Fredoka',sans-serif;
+
+    font-size:1.1rem;
+
+    font-weight:bold;
+
+    padding:14px 30px;
+
+    min-height:56px;
+
+    border-radius:18px;
+
+    cursor:pointer;
+
+}
+
+
+.special-reward{
+
+    border:4px solid #ffd43b;
+
+}
+
+
+/* =========================================
+   NOT ENOUGH POINTS
+========================================= */
+
+.reward-card.cannot-afford{
+
+    background:#ff4d5a !important;
+
+    border:5px solid #d91e36 !important;
+
+    box-shadow:
+        0 6px 0 #b8142b !important;
+
+}
+
+
+.reward-card.cannot-afford h3,
+.reward-card.cannot-afford p{
+
+    color:white !important;
+
+}
+
+
+.reward-card.cannot-afford .buy-btn{
+
+    background:#b8142b !important;
+
+    color:white !important;
+
+    cursor:not-allowed !important;
+
+}
+
+
+/* =========================================
+   OUT OF STOCK
+   DARK GREY AS REQUESTED
+========================================= */
+
+.reward-card.out-of-stock{
+
+    background:#dedede !important;
+
+    border:5px solid #888 !important;
+
+    box-shadow:
+        0 6px 0 #777 !important;
+
+    opacity:.9;
+
+}
+
+
+.reward-card.out-of-stock h3,
+.reward-card.out-of-stock p{
+
+    color:#555 !important;
+
+}
+
+
+.reward-card.out-of-stock .buy-btn{
+
+    background:#555 !important;
+
+    color:white !important;
+
+    cursor:not-allowed !important;
+
+}
+
+
+.buy-btn.remove-item-button{
+
+    background:#ff5c67 !important;
+
+    color:white !important;
+
+}
+
+
+/* =========================================
+   CART BUTTON
+========================================= */
+
+.cart-button{
+
+    border:3px solid #9b63e8;
+
+    background:#35166f;
+
+    color:white;
+
+    font-family:'Fredoka',sans-serif;
+
+    font-size:1.2rem;
+
+    font-weight:bold;
+
+    padding:15px 30px;
+
+    min-height:58px;
+
+    border-radius:20px;
+
+    cursor:pointer;
+
+    margin-top:35px;
+
+    box-shadow:
+        0 5px 0 #24104d,
+        0 8px 18px rgba(0,0,0,.18);
+
+}
+
+
+#cartCount{
+
+    display:inline-flex;
+
+    align-items:center;
+
+    justify-content:center;
+
+    min-width:32px;
+
+    height:32px;
+
+    margin-left:8px;
+
+    border-radius:50%;
+
+    background:#7b3ff2;
+
+    color:white;
+
+    border:2px solid white;
+
+}
+
+
+/* =========================================
+   CHECKOUT BUTTON
+   ONLY ONE MAIN CHECKOUT STYLE
+========================================= */
+
+.checkout-button,
+.checkout-btn,
+#checkoutButton{
+
+    width:90%;
+
+    max-width:500px;
+
+    border:3px solid #f0b800;
+
+    background:#ffd43b;
+
+    color:#503800;
+
+    font-family:'Fredoka',sans-serif;
+
+    font-size:1.35rem;
+
+    font-weight:700;
+
+    padding:18px 38px;
+
+    min-height:68px;
+
+    border-radius:22px;
+
+    cursor:pointer;
+
+    margin:25px auto 15px;
+
+    display:block;
+
+    box-shadow:
+        0 6px 0 #dcae12,
+        0 10px 20px rgba(0,0,0,.18);
+
+}
+
+
+.checkout-button:disabled,
+.checkout-btn:disabled,
+#checkoutButton:disabled{
+
+    opacity:.55;
+
+    cursor:not-allowed;
+
+}
+
+
+/* =========================================
+   PASSWORD
+========================================= */
+
+#loginScreen{
+
+    display:none;
+
+    flex-direction:column;
+
+    align-items:center;
+
+    min-height:100vh;
+
+    padding:50px 20px 150px;
+
+}
+
+
+.icon-password-grid{
+
+    display:grid;
+
+    grid-template-columns:
+        repeat(4,1fr);
+
+    gap:18px;
+
+    max-width:600px;
+
+}
+
+
+.password-icon{
+
+    width:110px;
+
+    height:110px;
+
+    border:none;
+
+    border-radius:28px;
+
+    background:white;
+
+    font-size:3.5rem;
+
+    cursor:pointer;
+
+    box-shadow:
+        0 8px 18px rgba(0,0,0,.2);
+
+}
+
+
+.password-icon.selected{
+
+    box-shadow:
+        0 0 0 6px #7b3ff2,
+        0 8px 18px rgba(0,0,0,.25);
+
+}
+
+
+.password-status{
+
+    color:white;
+
+    font-size:1.2rem;
+
+    font-weight:bold;
+
+    min-height:30px;
+
+}
+
+
+/* =========================================
+   TEACHER DASHBOARD
+========================================= */
+
+#teacherDashboard{
+
+    width:100%;
+
+    min-height:100vh;
+
+    padding:30px 24px 60px;
+
+    color:#222;
+
+    overflow:auto;
+
+    flex-direction:column;
+
+    align-items:center;
+
+    justify-content:flex-start;
+
+}
+
+
+.teacher-dashboard-header{
+
+    width:100%;
+
+    max-width:1500px;
+
+    margin:0 auto 25px;
+
+    display:flex;
+
+    flex-direction:column;
+
+    align-items:center;
+
+    justify-content:center;
+
+    text-align:center;
+
+}
+
+
+.teacher-dashboard-title{
+
+    display:flex;
+
+    align-items:center;
+
+    justify-content:center;
+
+    gap:15px;
+
+}
+
+
+.teacher-dashboard-title h1{
+
+    margin:0;
+
+    color:white;
+
+    font-size:3.5rem;
+
+    line-height:.95;
+
+}
+
+
+.teacher-dashboard-title h2{
+
+    margin:8px 0 0;
+
+    color:#ffd43b;
+
+    font-size:2rem;
+
+}
+
+
+.teacher-top-actions{
+
+    width:100%;
+
+    justify-content:center;
+
+    display:flex;
+
+    gap:10px;
+
+    flex-wrap:wrap;
+
+    margin-top:18px;
+
+}
+
+
+.teacher-header-button{
+
+    border:none;
+
+    border-radius:14px;
+
+    padding:13px 18px;
+
+    min-height:54px;
+
+    font-family:'Fredoka',sans-serif;
+
+    font-weight:bold;
+
+    cursor:pointer;
+
+}
+
+
+.reopen-button{
+
+    background:#ffd43b;
+
+    color:#513c00;
+
+}
+
+
+.exit-button{
+
+    background:#ef5350;
+
+    color:white;
+
+}
+
+
+/* =========================================
+   STUDENT TABLE
+========================================= */
+
+.teacher-dashboard-shell{
+
+    width:100%;
+
+    max-width:1500px;
+
+    margin:0 auto;
+
+    background:rgba(255,255,255,.96);
+
+    border-radius:18px;
+
+    box-shadow:
+        0 12px 35px rgba(0,0,0,.18);
+
+    display:grid;
+
+    grid-template-columns:1fr;
+
+    overflow:hidden;
+
+}
+
+
+.teacher-table-area{
+
+    min-width:0;
+
+    overflow:auto;
+
+}
+
+
+.teacher-student-table{
+
+    width:100%;
+
+    border-collapse:collapse;
+
+    table-layout:fixed;
+
+}
+
+
+.teacher-student-table th{
+
+    position:sticky;
+
+    top:0;
+
+    z-index:5;
+
+    background:#8050df;
+
+    color:white;
+
+    padding:13px 10px;
+
+    text-align:center;
+
+    font-size:.98rem;
+
+}
+
+
+.teacher-student-table th:first-child{
+
+    text-align:left;
+
+    padding-left:18px;
+
+}
+
+
+.teacher-student-table th:nth-child(1){
+
+    width:24%;
+
+}
+
+
+.teacher-student-table th:nth-child(2){
+
+    width:17%;
+
+}
+
+
+.teacher-student-table th:nth-child(3){
+
+    width:21%;
+
+}
+
+
+.teacher-student-table th:nth-child(4){
+
+    width:15%;
+
+}
+
+
+.teacher-student-table th:nth-child(5){
+
+    width:10%;
+
+}
+
+
+.teacher-student-table th:nth-child(6){
+
+    width:13%;
+
+}
+
+
+.teacher-student-table td{
+
+    border-bottom:1px solid #e5e5e5;
+
+    border-right:1px solid #e5e5e5;
+
+    padding:10px 9px;
+
+    text-align:center;
+
+    vertical-align:middle;
+
+    height:68px;
+
+    background:white;
+
+}
+
+
+.teacher-student-name{
+
+    display:flex;
+
+    align-items:center;
+
+    gap:10px;
+
+    text-align:left;
+
+    font-weight:600;
+
+    color:#54319b;
+
+}
+
+
+.teacher-student-avatar{
+
+    width:38px;
+
+    height:38px;
+
+    border-radius:50%;
+
+    background:#eee;
+
+    display:flex;
+
+    align-items:center;
+
+    justify-content:center;
+
+}
+
+
+.teacher-store-toggle{
+
+    min-width:110px;
+
+    min-height:50px;
+
+    border-radius:10px;
+
+    padding:9px 11px;
+
+    font-family:'Fredoka',sans-serif;
+
+    font-weight:700;
+
+    cursor:pointer;
+
+}
+
+
+.teacher-store-toggle.open{
+
+    color:#279144;
+
+    background:#eaf8ee;
+
+    border:1px solid #9cddb0;
+
+}
+
+
+.teacher-store-toggle.closed{
+
+    color:#6d6d6d;
+
+    background:#f1f1f1;
+
+    border:1px solid #d1d1d1;
+
+}
+
+
+.teacher-order-button{
+
+    border:none;
+
+    border-radius:10px;
+
+    background:#ffd43b;
+
+    color:#503c00;
+
+    padding:9px 14px;
+
+    min-height:50px;
+
+    font-family:'Fredoka',sans-serif;
+
+    font-size:.87rem;
+
+    font-weight:700;
+
+    cursor:pointer;
+
+}
+
+
+.teacher-no-order{
+
+    color:#888;
+
+    font-size:.85rem;
+
+    font-weight:600;
+
+}
+
+
+.teacher-status-circle{
+
+    width:20px;
+
+    height:20px;
+
+    border-radius:50%;
+
+    display:inline-block;
+
+    border:2px solid #9b9b9b;
+
+    background:white;
+
+}
+
+
+.teacher-status-circle.completed{
+
+    border-color:#2eae4d;
+
+    background:#39b95a;
+
+}
+
+
+.teacher-points-input{
+
+    width:90px;
+
+    min-height:45px;
+
+    padding:7px;
+
+    border:2px solid #9d6bea;
+
+    border-radius:10px;
+
+    background:white;
+
+    color:#4a347f;
+
+    text-align:center;
+
+    font-family:'Fredoka',sans-serif;
+
+    font-size:18px;
+
+    font-weight:700;
+
+}
+
+
+.teacher-update-points{
+
+    border:2px solid #9d6bea;
+
+    color:#7645bc;
+
+    background:white;
+
+    padding:8px 12px;
+
+    min-height:48px;
+
+    border-radius:10px;
+
+    font-family:'Fredoka',sans-serif;
+
+    font-weight:700;
+
+    cursor:pointer;
+
+}
+
+
+/* =========================================
+   INVENTORY — SPREADSHEET VIEW
+========================================= */
+
+.teacher-inventory-manager{
+
+    width:100%;
+
+    max-width:1500px;
+
+    margin:28px auto 0;
+
+    background:white;
+
+    border-radius:18px;
+
+    box-shadow:
+        0 12px 35px rgba(0,0,0,.18);
+
+    overflow:hidden;
+
+}
+
+
+.teacher-inventory-header{
+
+    width:100%;
+
+    padding:20px 24px;
+
+    background:#8050df;
+
+    color:white;
+
+    display:flex;
+
+    align-items:center;
+
+    justify-content:space-between;
+
+    gap:20px;
+
+}
+
+
+.teacher-inventory-header h2{
+
+    margin:0 0 5px;
+
+    font-size:1.7rem;
+
+}
+
+
+.teacher-inventory-header p{
+
+    margin:0;
+
+    font-size:.95rem;
+
+}
+
+
+.teacher-inventory-header strong{
+
+    color:#ffd43b;
+
+}
+
+
+.refresh-inventory-button{
+
+    flex:none;
+
+    border:none;
+
+    border-radius:12px;
+
+    padding:12px 17px;
+
+    min-height:50px;
+
+    background:#ffd43b;
+
+    color:#503800;
+
+    font-family:'Fredoka',sans-serif;
+
+    font-weight:700;
+
+    cursor:pointer;
+
+    box-shadow:
+        0 4px 0 #dcae12;
+
+}
+
+
+.teacher-inventory-sheet-wrap{
+
+    width:100%;
+
+    overflow-x:auto;
+
+}
+
+
+.teacher-inventory-sheet{
+
+    width:100%;
+
+    min-width:780px;
+
+    border-collapse:collapse;
+
+    table-layout:fixed;
+
+}
+
+
+.teacher-inventory-sheet th{
+
+    background:#f1ebff;
+
+    color:#56319b;
+
+    padding:14px 12px;
+
+    border-bottom:2px solid #d8caee;
+
+    text-align:center;
+
+    font-size:.95rem;
+
+}
+
+
+.teacher-inventory-sheet th:first-child{
+
+    width:34%;
+
+    text-align:left;
+
+    padding-left:22px;
+
+}
+
+
+.teacher-inventory-sheet th:nth-child(2){
+
+    width:15%;
+
+}
+
+
+.teacher-inventory-sheet th:nth-child(3){
+
+    width:18%;
+
+}
+
+
+.teacher-inventory-sheet th:nth-child(4){
+
+    width:20%;
+
+}
+
+
+.teacher-inventory-sheet th:nth-child(5){
+
+    width:13%;
+
+}
+
+
+.teacher-inventory-sheet td{
+
+    height:68px;
+
+    padding:9px 12px;
+
+    border-bottom:1px solid #e4e4e4;
+
+    border-right:1px solid #ededed;
+
+    background:white;
+
+    text-align:center;
+
+    vertical-align:middle;
+
+}
+
+
+.teacher-inventory-sheet tbody tr:hover td{
+
+    background:#faf8ff;
+
+}
+
+
+.teacher-inventory-sheet td:first-child{
+
+    text-align:left;
+
+    padding-left:22px;
+
+    color:#54319b;
+
+}
+
+
+.teacher-inventory-sheet td:nth-child(2){
+
+    color:#54319b;
+
+    font-weight:700;
+
+}
+
+
+.teacher-inventory-input{
+
+    width:90px;
+
+    min-height:46px;
+
+    border:2px solid #9d6bea;
+
+    border-radius:10px;
+
+    background:white;
+
+    color:#4a347f;
+
+    text-align:center;
+
+    font-family:'Fredoka',sans-serif;
+
+    font-size:18px;
+
+    font-weight:700;
+
+    padding:7px;
+
+}
+
+
+.teacher-inventory-input:focus{
+
+    outline:none;
+
+    border-color:#7b3ff2;
+
+    box-shadow:
+        0 0 0 3px rgba(123,63,242,.15);
+
+}
+
+
+.inventory-status-in,
+.inventory-status-out{
+
+    display:inline-flex;
+
+    align-items:center;
+
+    justify-content:center;
+
+    min-width:135px;
+
+    padding:9px 12px;
+
+    border-radius:10px;
+
+    font-size:.88rem;
+
+    font-weight:700;
+
+}
+
+
+.inventory-status-in{
+
+    background:#eaf8ee;
+
+    color:#279144;
+
+    border:1px solid #9cddb0;
+
+}
+
+
+.inventory-status-out{
+
+    background:#eeeeee;
+
+    color:#555;
+
+    border:1px solid #c8c8c8;
+
+}
+
+
+.inventory-empty-row td{
+
+    background:#fafafa;
+
+}
+
+
+.inventory-empty-row td:first-child{
+
+    color:#777;
+
+}
+
+
+.teacher-inventory-save{
+
+    border:none;
+
+    border-radius:10px;
+
+    background:#ffd43b;
+
+    color:#503800;
+
+    padding:9px 14px;
+
+    min-height:46px;
+
+    font-family:'Fredoka',sans-serif;
+
+    font-weight:700;
+
+    cursor:pointer;
+
+    box-shadow:
+        0 3px 0 #dcae12;
+
+}
+
+
+.teacher-inventory-save:disabled{
+
+    opacity:.6;
+
+    cursor:not-allowed;
+
+}
+
+
+/* =========================================
+   ORDER DETAILS
+========================================= */
+
+.teacher-order-details.hidden-order-details{
+
+    display:none !important;
+
+}
+
+
+.teacher-order-details:not(.hidden-order-details){
+
+    display:flex;
+
+    min-width:0;
+
+    background:#fbfbff;
+
+    flex-direction:column;
+
+    overflow:hidden;
+
+}
+
+
+.order-details-header{
+
+    display:flex;
+
+    align-items:center;
+
+    justify-content:space-between;
+
+    padding:18px 20px;
+
+    border-bottom:1px solid #ddd;
+
+    background:white;
+
+}
+
+
+.order-details-header h2{
+
+    color:#5b3199;
+
+    font-size:1.45rem;
+
+}
+
+
+.close-order-details{
+
+    width:44px;
+
+    height:44px;
+
+    border:none;
+
+    border-radius:10px;
+
+    background:#ffd43b;
+
+    cursor:pointer;
+
+}
+
+
+.order-details-content{
+
+    padding:18px;
+
+    overflow-y:auto;
+
+    flex:1;
+
+}
+
+
+.order-student-title{
+
+    color:#5b3199;
+
+    font-size:1.5rem;
+
+    margin-bottom:15px;
+
+}
+
+
+.order-status-strip{
+
+    border-radius:14px;
+
+    padding:12px 14px;
+
+    background:#ffd43b;
+
+    color:#5a4300;
+
+    font-weight:bold;
+
+    margin-bottom:15px;
+
+    text-align:center;
+
+}
+
+
+.order-status-strip.completed{
+
+    background:#49b94f;
+
+    color:white;
+
+}
+
+
+.order-stat-box{
+
+    background:white;
+
+    border:1px solid #ddd;
+
+    border-radius:15px;
+
+    padding:14px;
+
+}
+
+
+.order-stat-row{
+
+    display:flex;
+
+    justify-content:space-between;
+
+    padding:6px 0;
+
+}
+
+
+.order-items-title{
+
+    color:#5b3199;
+
+    font-size:1.15rem;
+
+    margin:18px 0 10px;
+
+}
+
+
+.order-item-detail{
+
+    display:flex;
+
+    align-items:center;
+
+    justify-content:space-between;
+
+    gap:12px;
+
+    background:white;
+
+    border:1px solid #ddd;
+
+    border-radius:14px;
+
+    padding:12px;
+
+    margin-bottom:9px;
+
+}
+
+
+.order-item-name{
+
+    font-weight:700;
+
+    color:#4e3c74;
+
+}
+
+
+.order-item-price{
+
+    font-weight:700;
+
+    color:#4e3c74;
+
+}
+
+
+.cancel-item-button{
+
+    border:none;
+
+    border-radius:10px;
+
+    padding:8px 10px;
+
+    min-height:48px;
+
+    background:#ef4444;
+
+    color:white;
+
+    font-family:'Fredoka',sans-serif;
+
+    font-size:.8rem;
+
+    font-weight:700;
+
+    cursor:pointer;
+
+}
+
+
+.complete-order-button{
+
+    width:100%;
+
+    border:none;
+
+    border-radius:14px;
+
+    background:#49b94f;
+
+    color:white;
+
+    padding:14px;
+
+    min-height:56px;
+
+    font-family:'Fredoka',sans-serif;
+
+    font-weight:700;
+
+    cursor:pointer;
+
+    margin-top:15px;
+
+}
+
+
+.cancel-entire-order-button{
+
+    width:100%;
+
+    border:none;
+
+    border-radius:14px;
+
+    background:#ef4444;
+
+    color:white;
+
+    padding:14px;
+
+    min-height:56px;
+
+    font-family:'Fredoka',sans-serif;
+
+    font-weight:700;
+
+    cursor:pointer;
+
+    margin-top:12px;
+
+}
+
+
+/* =========================================
+   RECEIPT
+========================================= */
+
+#receiptScreen{
+
+    position:fixed;
+
+    inset:0;
+
+    z-index:9999;
+
+    background:#fff8df;
+
+    overflow-y:auto;
+
+    padding:30px 20px 60px;
+
+}
+
+
+/* =========================================
+   HOVER / TOUCH
+========================================= */
+
+@media (hover:hover){
+
+    .student-bubble:hover{
+
+        transform:
+            scale(1.03)
+            translateY(-3px);
+
+        box-shadow:
+            0 12px 26px rgba(0,0,0,.20);
+
+    }
+
+
+    .reward-card:hover{
+
+        transform:
+            translateY(-5px)
+            scale(1.02);
+
+    }
+
+}
+
+
+button:active{
+
+    transform:scale(.97);
+
+}
+
+
+.student-bubble:active{
+
+    transform:scale(.96);
+
+}
+
+
+.buy-btn:active,
+.cart-button:active,
+.checkout-button:active,
+.checkout-btn:active,
+#checkoutButton:active{
+
+    transform:scale(.96);
+
+}
+
+
+/* =========================================
+   TABLET / IPAD
+========================================= */
+
+@media(max-width:1100px){
+
+    .student-grid{
+
+        grid-template-columns:
+            repeat(3,minmax(0,1fr));
+
+        gap:24px;
+
+        max-width:950px;
+
+    }
+
+
+    .student-bubble{
+
+        width:100%;
+
+        min-height:340px;
+
+        padding:20px;
+
+    }
+
+
+    .student-photo{
+
+        width:180px;
+
+        height:180px;
+
+    }
+
+
+    .shop-grid{
+
+        grid-template-columns:
+            repeat(2,minmax(250px,1fr));
+
+        max-width:760px;
+
+    }
+
+}
+
+
+/* =========================================
+   SMALL TABLET
+========================================= */
+
+@media(max-width:900px) and (min-width:601px){
+
+    .student-grid{
+
+        grid-template-columns:
+            repeat(3,minmax(0,1fr));
+
+        gap:18px;
+
+        max-width:760px;
+
+    }
+
+
+    .student-bubble{
+
+        min-height:310px;
+
+        padding:16px;
+
+        border-radius:25px;
+
+        gap:15px;
+
+    }
+
+
+    .student-photo{
+
+        width:155px;
+
+        height:155px;
+
+    }
+
+
+    .teacher-dashboard-shell{
+
+        overflow-x:auto;
+
+    }
+
+
+    .teacher-inventory-header{
+
+        align-items:flex-start;
+
+    }
+
+}
+
+
+/* =========================================
+   PHONE
+========================================= */
+
+@media(max-width:600px){
+
+    .welcome-screen{
+
+        padding:15px;
+
+    }
+
+
+    .dojo-store-building{
+
+        padding:12px 12px 25px;
+
+    }
+
+
+    .dojo-door-area{
+
+        height:340px;
+
+    }
+
+
+    .door-window{
+
+        width:105px;
+
+        height:100px;
+
+    }
+
+
+    .door-name{
+
+        font-size:1.4rem;
+
+    }
+
+
+    .student-grid{
+
+        grid-template-columns:1fr;
+
+        max-width:320px;
+
+        gap:25px;
+
+    }
+
+
+    .student-bubble{
+
+        width:min(300px,90vw);
+
+        min-height:330px;
+
+        padding:20px;
+
+    }
+
+
+    .student-photo{
+
+        width:180px;
+
+        height:180px;
+
+    }
+
+
+    .shop-grid{
+
+        grid-template-columns:1fr;
+
+    }
+
+
+    .reward-card{
+
+        width:min(300px,90vw);
+
+    }
+
+
+    .icon-password-grid{
+
+        grid-template-columns:
+            repeat(2,1fr);
+
+    }
+
+
+    .teacher-inventory-header{
+
+        flex-direction:column;
+
+        align-items:stretch;
+
+        text-align:center;
+
+    }
+
+
+    .teacher-inventory-sheet{
+
+        min-width:720px;
+
+    }
+
+
+    #teacherDashboard{
+
+        padding:20px 10px 50px;
+
+    }
+
+}
+
+
+/* =========================================
+   IPAD PORTRAIT TOUCH IMPROVEMENTS
+========================================= */
+
+@media (min-width:601px) and (max-width:1100px){
+
+    .student-bubble{
+
+        min-height:320px;
+
+    }
+
+
+    .student-bubble span{
+
+        font-size:1.15rem;
+
+    }
+
+
+    .buy-btn{
+
+        min-height:60px;
+
+        padding:15px 32px;
+
+    }
+
+
+    .cart-button{
+
+        min-height:62px;
+
+    }
+
+
+    .checkout-button,
+    .checkout-btn,
+    #checkoutButton{
+
+        min-height:72px;
+
+        font-size:1.45rem;
+
+    }
+
+}
+
+
+/* =========================================
+   INVENTORY TABLE — EXTRA IPAD FIX
+========================================= */
+
+@media (min-width:601px){
+
+    .teacher-inventory-manager{
+
+        margin-bottom:30px;
+
+    }
+
+
+    .teacher-inventory-sheet td,
+    .teacher-inventory-sheet th{
+
+        white-space:nowrap;
+
+    }
+
+}
+
+
+/* =========================================
+   FINAL DOOR POSITION FIX
+========================================= */
+
+.dojo-door-left{
+
+    left:0;
+
+    right:auto;
+
+    transform-origin:left center;
+
+}
+
+
+.dojo-door-right{
+
+    right:0;
+
+    left:auto;
+
+    transform-origin:right center;
+
+    z-index:4;
+
+}
