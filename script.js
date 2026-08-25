@@ -2655,9 +2655,7 @@ function renderTeacherTable(){
                     "teacher-order-button";
 
 
-                orderButton.textContent=
-                    `🟡 View Order (${order.items.length})`;
-
+                orderButton.textContent = `View Order (${Array.isArray(order.items) ? order.items.length : 0})`;
 
                 orderButton.onclick=
                     ()=>{
