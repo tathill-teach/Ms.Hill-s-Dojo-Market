@@ -329,6 +329,30 @@ const reopenStoreButton=
 const closeTeacherDashboardButton=
     $("closeTeacherDashboard");
 
+/* =========================================
+   TEACHER DASHBOARD TABS
+========================================= */
+
+const teacherTabs=
+    qa(".teacher-tab");
+
+const studentsTab=
+    $("studentsTab");
+
+const ordersTab=
+    $("ordersTab");
+
+const inventoryTab=
+    $("inventoryTab");
+
+const settingsTab=
+    $("settingsTab");
+
+const teacherOrdersList=
+    $("teacherOrdersList");
+
+const teacherInventoryContainer=
+    $("teacherInventoryContainer");
 
 /* =========================================
    INVENTORY FIREBASE SERIALIZATION
