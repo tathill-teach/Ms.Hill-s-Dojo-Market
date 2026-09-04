@@ -3254,3 +3254,35 @@ button:active{
     }
 
 }
+
+/* =========================================
+   FINAL FIX — MAKE DOJO DOORS CLICKABLE
+========================================= */
+
+.dojo-door-area {
+    position: relative;
+}
+
+.dojo-inside {
+    pointer-events: none;
+}
+
+.dojo-door {
+    position: absolute;
+    z-index: 20 !important;
+    pointer-events: auto !important;
+    cursor: pointer;
+    touch-action: manipulation;
+}
+
+.dojo-door-left {
+    left: 0 !important;
+    right: auto !important;
+    z-index: 21 !important;
+}
+
+.dojo-door-right {
+    right: 0 !important;
+    left: auto !important;
+    z-index: 22 !important;
+}
