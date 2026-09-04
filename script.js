@@ -3450,10 +3450,19 @@ function renderInventory(){
             `;
 
 
-        teacherDashboard.appendChild(
-            shell
-        );
+        if(teacherInventoryContainer){
 
+    teacherInventoryContainer.appendChild(
+        shell
+    );
+
+}else{
+
+    teacherDashboard.appendChild(
+        shell
+    );
+
+}
 
         table=
             $("teacherInventoryTable");
