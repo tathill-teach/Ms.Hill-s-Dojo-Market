@@ -1228,66 +1228,52 @@ function openDojoMart(){
    STUDENT SELECTION
 ========================================= */
 
-studentButtons.forEach((button, index) => {
+studentButtons.forEach(
+    (button,index)=>{
 
-    button.addEventListener("click", async () => {
+        button.addEventListener(
+            "click",
+            ()=>{
 
-        currentStudentIndex = index;
+                // Remember which student was clicked
+                currentStudentIndex = index;
 
-        await refreshStudent(index);
 
-        const latestAccess = await firebaseGet("storeAccess");
+                // Always start with a fresh password
+                selectedPasswordIcons = [];
 
-        if (Array.isArray(latestAccess)) {
-            storeAccess = latestAccess;
-        }
 
-        const latestOrder = await firebaseGet(`orders/${index}`);
+                // Remove any old selections
+                passwordIcons.forEach(
+                    icon=>{
+                        icon.classList.remove(
+                            "selected"
+                        );
+                    }
+                );
 
-        if (latestOrder) {
-            studentOrders[index] = latestOrder;
-            saveLocal();
-        }
 
-        // ONLY an active PROCESSING order goes
-        // directly to the receipt.
-        if (
-            latestOrder &&
-            latestOrder.status === "processing"
-        ) {
-            hideScreen(studentScreen);
-            showReceipt();
-            return;
-        }
+                // Reset the message
+                passwordStatus.textContent =
+                    "Choose 2 pictures";
 
-        // Completed orders do NOT block login.
-        if (!storeAccess.includes(index)) {
 
-            alert(
-                "The Treasure Store is not open for you yet! 💜"
-            );
+                // Hide student selection
+                hideScreen(
+                    studentScreen
+                );
 
-            currentStudentIndex = null;
-            return;
-        }
 
-        // Reset picture password
-        selectedPasswordIcons = [];
+                // SHOW PASSWORD SCREEN
+                showScreen(
+                    loginScreen
+                );
 
-        passwordIcons.forEach(icon => {
-            icon.classList.remove("selected");
-        });
+            }
+        );
 
-        passwordStatus.textContent =
-            "Choose 2 pictures";
-
-        // Show password screen
-        hideScreen(studentScreen);
-        showScreen(loginScreen);
-
-    });
-
-});
+    }
+);
 /* =========================================
    PASSWORD ICONS
 ========================================= */
