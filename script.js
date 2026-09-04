@@ -2332,8 +2332,8 @@ function showReceipt(){
 
 
                 ${
-                    order.items.map(
-                        item=>`
+(Array.isArray(order.items) ? order.items : []).map(
+   item=>`
 
                             <div style="
                                 display:flex;
