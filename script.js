@@ -3942,15 +3942,15 @@ async function openTeacherDashboard(){
 
     await refreshAll();
 
+renderTeacherTable();
 
-    renderTeacherTable();
+renderTeacherOrders();
 
-    renderInventory();
+renderInventory();
 
-
-    showScreen(
-        teacherDashboard
-    );
+showScreen(
+    teacherDashboard
+);
 
 }
 
