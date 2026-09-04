@@ -1,7 +1,7 @@
 /* =========================================
    MS. HILL'S DOJO MART — FIREBASE SCRIPT
    ========================================= */
-
+ 
 const firebaseConfig={
 apiKey:"AIzaSyA0S-jXeSRLfb2nId7GxvTpbMbfbtgRWK",
 authDomain:"ms-hill-dojo-mart.firebaseapp.com",
