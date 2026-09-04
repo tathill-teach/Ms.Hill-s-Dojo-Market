@@ -3752,6 +3752,162 @@ function renderInventory(){
 
 }
 
+/* =========================================
+   RENDER TEACHER ORDERS TAB
+========================================= */
+
+function renderTeacherOrders(){
+
+    if(!teacherOrdersList){
+
+        return;
+
+    }
+
+
+    teacherOrdersList.innerHTML="";
+
+
+    const orders=
+        students
+            .map(
+                (student,index)=>({
+
+                    student,
+                    index,
+                    order:
+                        studentOrders[index]
+
+                })
+            )
+            .filter(
+                item=>
+                    item.order
+            );
+
+
+    if(orders.length===0){
+
+        teacherOrdersList.innerHTML=
+            `
+
+            <div class="no-order-selected">
+
+                <div class="no-order-icon">
+                    🧾
+                </div>
+
+                <h3>
+                    No Orders Yet
+                </h3>
+
+                <p>
+                    Student orders will appear here
+                    when they check out.
+                </p>
+
+            </div>
+
+            `;
+
+        return;
+
+    }
+
+
+    orders.forEach(
+        ({student,index,order})=>{
+
+            const items=
+                Array.isArray(order.items)
+                    ? order.items
+                    : [];
+
+
+            const completed=
+                order.status===
+                "fulfilled";
+
+
+            const button=
+                document.createElement(
+                    "button"
+                );
+
+
+            button.type=
+                "button";
+
+
+            button.className=
+                "teacher-order-list-item";
+
+
+            button.innerHTML=
+                `
+
+                <span class="
+                    teacher-order-list-name
+                ">
+
+                    ${student.name}
+
+                </span>
+
+
+                <span class="
+                    teacher-order-list-status
+                    ${
+                        completed
+                            ? "completed"
+                            : "processing"
+                    }
+                ">
+
+                    ${
+                        completed
+                            ? "🟢 Completed"
+                            : "🟡 Processing"
+                    }
+
+                    · ${items.length} item${
+                        items.length===1
+                            ? ""
+                            : "s"
+                    }
+
+                </span>
+
+
+                <span class="
+                    teacher-order-list-view
+                ">
+
+                    View Order →
+
+                </span>
+
+                `;
+
+
+            button.onclick=
+                ()=>{
+
+                    openTeacherOrderDetails(
+                        index
+                    );
+
+                };
+
+
+            teacherOrdersList.appendChild(
+                button
+            );
+
+        }
+    );
+
+}
 
 /* =========================================
    TEACHER DASHBOARD
@@ -3802,6 +3958,108 @@ async function openTeacherDashboard(){
 /* =========================================
    EVENT LISTENERS
 ========================================= */
+
+/* =========================================
+   TEACHER TAB NAVIGATION
+========================================= */
+
+teacherTabs.forEach(
+    tab=>{
+
+        tab.addEventListener(
+            "click",
+            ()=>{
+
+                const tabName=
+                    tab.dataset.tab;
+
+
+                teacherTabs.forEach(
+                    item=>{
+                        item.classList.remove(
+                            "active"
+                        );
+                    }
+                );
+
+
+                tab.classList.add(
+                    "active"
+                );
+
+
+                qa(".teacher-tab-panel")
+                    .forEach(
+                        panel=>{
+
+                            panel.classList.remove(
+                                "active-tab-panel"
+                            );
+
+                        }
+                    );
+
+
+                if(
+                    tabName==="students"
+                ){
+
+                    studentsTab.classList.add(
+                        "active-tab-panel"
+                    );
+
+                    teacherOrderDetails.classList.add(
+                        "hidden-order-details"
+                    );
+
+                }
+
+
+                if(
+                    tabName==="orders"
+                ){
+
+                    ordersTab.classList.add(
+                        "active-tab-panel"
+                    );
+
+                    renderTeacherOrders();
+
+                }
+
+
+                if(
+                    tabName==="inventory"
+                ){
+
+                    inventoryTab.classList.add(
+                        "active-tab-panel"
+                    );
+
+                    renderInventory();
+
+                }
+
+
+                if(
+                    tabName==="settings"
+                ){
+
+                    settingsTab.classList.add(
+                        "active-tab-panel"
+                    );
+
+                    teacherOrderDetails.classList.add(
+                        "hidden-order-details"
+                    );
+
+                }
+
+            }
+        );
+
+    }
+);
 
 if(dojoDoorButton){
 
