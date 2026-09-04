@@ -2833,16 +2833,13 @@ function renderTeacherTable(){
    TEACHER ORDER DETAILS
 ========================================= */
 
-function openTeacherOrderDetails(
-    index
-){
+function openTeacherOrderDetails(index){
 
-    const order=
+    const order =
         studentOrders[index];
 
-
     if(
-        !order||
+        !order ||
         !teacherOrderDetails
     ){
 
@@ -2856,17 +2853,26 @@ function openTeacherOrderDetails(
     );
 
 
-    const completed=
-        order.status===
-        "fulfilled";
+    const completed =
+        order.status === "fulfilled";
 
 
-    orderDetailsContent.innerHTML=
-        `
+    /*
+       IMPORTANT:
+       Always make sure items is an array.
+       This prevents a broken/old Firebase order
+       from crashing the entire page.
+    */
 
-        <h3 class="
-            order-student-title
-        ">
+    const items =
+        Array.isArray(order.items)
+            ? order.items
+            : [];
+
+
+    orderDetailsContent.innerHTML = `
+
+        <h3 class="order-student-title">
 
             ${students[index].name}'s Order
 
@@ -2875,7 +2881,7 @@ function openTeacherOrderDetails(
 
         <div class="
             order-status-strip
-            ${completed?"completed":""}
+            ${completed ? "completed" : ""}
         ">
 
             ${
@@ -2887,9 +2893,7 @@ function openTeacherOrderDetails(
         </div>
 
 
-        <div class="
-            order-stat-box
-        ">
+        <div class="order-stat-box">
 
             <div class="order-stat-row">
 
@@ -2898,7 +2902,7 @@ function openTeacherOrderDetails(
                 </strong>
 
                 <strong>
-                    ⭐ ${order.total}
+                    ⭐ ${Number(order.total) || 0}
                 </strong>
 
             </div>
@@ -2911,7 +2915,7 @@ function openTeacherOrderDetails(
                 </strong>
 
                 <strong>
-                    ⭐ ${order.remainingPoints}
+                    ⭐ ${Number(order.remainingPoints) || 0}
                 </strong>
 
             </div>
@@ -2924,7 +2928,7 @@ function openTeacherOrderDetails(
                 </strong>
 
                 <strong>
-                    ${order.items.length}
+                    ${items.length}
                 </strong>
 
             </div>
@@ -2932,9 +2936,7 @@ function openTeacherOrderDetails(
         </div>
 
 
-        <h4 class="
-            order-items-title
-        ">
+        <h4 class="order-items-title">
 
             🛍️ Order Items
 
@@ -2942,85 +2944,105 @@ function openTeacherOrderDetails(
 
 
         ${
-            order.items.map(
-                (item,itemIndex)=>`
+            items.length === 0
 
-                    <div class="
-                        order-item-detail
+                ? `
+
+                    <div style="
+                        padding:20px;
+                        text-align:center;
+                        background:#fff;
+                        border-radius:15px;
+                        margin-bottom:15px;
                     ">
 
-                        <div>
-
-                            <div class="
-                                order-item-name
-                            ">
-                                ${item.name}
-                            </div>
-
-                            <div class="
-                                order-item-price
-                            ">
-                                ⭐ ${item.price}
-                            </div>
-
-                        </div>
-
-
-                        ${
-                            completed
-                                ? ""
-                                : `
-
-                                <button
-                                    class="
-                                        cancel-item-button
-                                    "
-                                    data-item="${itemIndex}">
-
-                                    ❌ Cancel
-
-                                </button>
-
-                                `
-                        }
+                        ⚠️ No item details were saved
+                        for this order.
 
                     </div>
 
                 `
-            ).join("")
+
+                : items.map(
+                    (item,itemIndex)=>`
+
+                        <div class="
+                            order-item-detail
+                        ">
+
+                            <div>
+
+                                <div class="
+                                    order-item-name
+                                ">
+                                    ${item?.name || "Treasure"}
+                                </div>
+
+                                <div class="
+                                    order-item-price
+                                ">
+                                    ⭐ ${Number(item?.price) || 0}
+                                </div>
+
+                            </div>
+
+
+                            ${
+                                completed
+                                    ? ""
+                                    : `
+
+                                        <button
+                                            class="
+                                                cancel-item-button
+                                            "
+                                            data-item="${itemIndex}">
+
+                                            ❌ Cancel
+
+                                        </button>
+
+                                    `
+                            }
+
+                        </div>
+
+                    `
+                ).join("")
         }
 
 
         ${
             completed
                 ? ""
+
                 : `
 
-                <button
-                    id="completeSelectedOrder"
-                    class="
-                        complete-order-button
-                    ">
+                    <button
+                        id="completeSelectedOrder"
+                        class="
+                            complete-order-button
+                        ">
 
-                    🟢 Complete Order
+                        🟢 Complete Order
 
-                </button>
+                    </button>
 
 
-                <button
-                    id="cancelEntireOrder"
-                    class="
-                        cancel-entire-order-button
-                    ">
+                    <button
+                        id="cancelEntireOrder"
+                        class="
+                            cancel-entire-order-button
+                        ">
 
-                    ❌ Cancel Entire Order
+                        ❌ Cancel Entire Order
 
-                </button>
+                    </button>
 
                 `
         }
 
-        `;
+    `;
 
 
     teacherOrderDetails
@@ -3028,54 +3050,53 @@ function openTeacherOrderDetails(
             ".cancel-item-button"
         )
         .forEach(
-            button=>{
+            button => {
 
-                button.onclick=
-                    ()=>{
+                button.onclick = () => {
 
-                        cancelSpecificOrderItem(
-                            index,
-                            Number(
-                                button.dataset.item
-                            )
-                        );
+                    cancelSpecificOrderItem(
+                        index,
+                        Number(
+                            button.dataset.item
+                        )
+                    );
 
-                    };
+                };
 
             }
         );
 
 
-    const completeButton=
+    const completeButton =
         $("completeSelectedOrder");
 
 
     if(completeButton){
 
-        completeButton.onclick=
-            ()=>{
-                completeOrder(index);
-            };
+        completeButton.onclick = () => {
+
+            completeOrder(index);
+
+        };
 
     }
 
 
-    const cancelButton=
+    const cancelButton =
         $("cancelEntireOrder");
 
 
     if(cancelButton){
 
-        cancelButton.onclick=
-            ()=>{
-                cancelEntireOrder(index);
-            };
+        cancelButton.onclick = () => {
+
+            cancelEntireOrder(index);
+
+        };
 
     }
 
 }
-
-
 /* =========================================
    CANCEL ONE ITEM
 ========================================= */
