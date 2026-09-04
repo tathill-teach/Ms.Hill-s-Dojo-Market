@@ -1228,114 +1228,66 @@ function openDojoMart(){
    STUDENT SELECTION
 ========================================= */
 
-studentButtons.forEach(
-    (button,index)=>{
+studentButtons.forEach((button, index) => {
 
-        button.addEventListener(
-            "click",
-            async()=>{
+    button.addEventListener("click", async () => {
 
-                currentStudentIndex=
-                    index;
+        currentStudentIndex = index;
 
+        await refreshStudent(index);
 
-                await refreshStudent(
-                    index
-                );
+        const latestAccess = await firebaseGet("storeAccess");
 
+        if (Array.isArray(latestAccess)) {
+            storeAccess = latestAccess;
+        }
 
-                const latestOrder=
-                    await firebaseGet(
-                        `orders/${index}`
-                    );
+        const latestOrder = await firebaseGet(`orders/${index}`);
 
+        if (latestOrder) {
+            studentOrders[index] = latestOrder;
+            saveLocal();
+        }
 
-                if(latestOrder){
+        // ONLY an active PROCESSING order goes
+        // directly to the receipt.
+        if (
+            latestOrder &&
+            latestOrder.status === "processing"
+        ) {
+            hideScreen(studentScreen);
+            showReceipt();
+            return;
+        }
 
-                    studentOrders[index]=
-                        latestOrder;
+        // Completed orders do NOT block login.
+        if (!storeAccess.includes(index)) {
 
-                    saveLocal();
+            alert(
+                "The Treasure Store is not open for you yet! 💜"
+            );
 
-                    hideScreen(
-                        studentScreen
-                    );
+            currentStudentIndex = null;
+            return;
+        }
 
-                    showReceipt();
+        // Reset picture password
+        selectedPasswordIcons = [];
 
-                    return;
+        passwordIcons.forEach(icon => {
+            icon.classList.remove("selected");
+        });
 
-                }
+        passwordStatus.textContent =
+            "Choose 2 pictures";
 
+        // Show password screen
+        hideScreen(studentScreen);
+        showScreen(loginScreen);
 
-                const latestAccess=
-                    await firebaseGet(
-                        "storeAccess"
-                    );
+    });
 
-
-                if(
-                    Array.isArray(
-                        latestAccess
-                    )
-                ){
-
-                    storeAccess=
-                        latestAccess;
-
-                }
-
-
-                if(
-                    !storeAccess.includes(
-                        index
-                    )
-                ){
-
-                    alert(
-                        "The Treasure Store is not open for you yet! 💜"
-                    );
-
-                    currentStudentIndex=
-                        null;
-
-                    return;
-
-                }
-
-
-                hideScreen(
-                    studentScreen
-                );
-
-
-                selectedPasswordIcons=
-                    [];
-
-
-                passwordIcons.forEach(
-                    icon=>
-                        icon.classList.remove(
-                            "selected"
-                        )
-                );
-
-
-                passwordStatus.textContent=
-                    "Choose 2 pictures";
-
-
-                showScreen(
-                    loginScreen
-                );
-
-            }
-        );
-
-    }
-);
-
-
+});
 /* =========================================
    PASSWORD ICONS
 ========================================= */
