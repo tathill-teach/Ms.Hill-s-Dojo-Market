@@ -1133,55 +1133,220 @@
     </header>
 
 
+    <!-- =================================
+         DASHBOARD TABS
+    ================================== -->
+
+    <nav class="teacher-dashboard-tabs">
+
+        <button
+            type="button"
+            class="teacher-tab active"
+            data-tab="students">
+
+            👩🏽‍🏫 Students
+
+        </button>
+
+
+        <button
+            type="button"
+            class="teacher-tab"
+            data-tab="orders">
+
+            🧾 Orders
+
+        </button>
+
+
+        <button
+            type="button"
+            class="teacher-tab"
+            data-tab="inventory">
+
+            📦 Inventory
+
+        </button>
+
+
+        <button
+            type="button"
+            class="teacher-tab"
+            data-tab="settings">
+
+            ⚙️ Settings
+
+        </button>
+
+    </nav>
+
+
+    <!-- =================================
+         DASHBOARD CONTENT
+    ================================== -->
+
     <div class="teacher-dashboard-shell">
 
 
-        <div class="teacher-table-area">
+        <!-- ==============================
+             STUDENTS TAB
+        =============================== -->
 
-            <table
-                class="teacher-student-table">
-
-                <thead>
-
-                    <tr>
-
-                        <th>
-                            Student Name
-                        </th>
-
-                        <th>
-                            Store Access
-                        </th>
-
-                        <th>
-                            Order Processing
-                        </th>
-
-                        <th>
-                            Completed Order
-                        </th>
-
-                        <th>
-                            Points
-                        </th>
-
-                        <th>
-                            Update Points
-                        </th>
-
-                    </tr>
-
-                </thead>
+        <div
+            id="studentsTab"
+            class="teacher-tab-panel active-tab-panel">
 
 
-                <tbody
-                    id="teacherStudentTableBody">
-                </tbody>
+            <div class="teacher-table-area">
 
-            </table>
+                <table
+                    class="teacher-student-table">
+
+                    <thead>
+
+                        <tr>
+
+                            <th>
+                                Student Name
+                            </th>
+
+                            <th>
+                                Store Access
+                            </th>
+
+                            <th>
+                                Order
+                            </th>
+
+                            <th>
+                                Completed
+                            </th>
+
+                            <th>
+                                Points
+                            </th>
+
+                            <th>
+                                Update Points
+                            </th>
+
+                        </tr>
+
+                    </thead>
+
+
+                    <tbody
+                        id="teacherStudentTableBody">
+                    </tbody>
+
+                </table>
+
+            </div>
 
         </div>
 
+
+        <!-- ==============================
+             ORDERS TAB
+        =============================== -->
+
+        <div
+            id="ordersTab"
+            class="teacher-tab-panel">
+
+
+            <div class="teacher-orders-area">
+
+                <div class="teacher-section-heading">
+
+                    <h2>
+                        🧾 Student Orders
+                    </h2>
+
+                    <p>
+                        Click an order to view the details.
+                    </p>
+
+                </div>
+
+
+                <div
+                    id="teacherOrdersList"
+                    class="teacher-orders-list">
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- ==============================
+             INVENTORY TAB
+        =============================== -->
+
+        <div
+            id="inventoryTab"
+            class="teacher-tab-panel">
+
+
+            <div
+                id="teacherInventoryContainer"
+                class="teacher-inventory-container">
+            </div>
+
+        </div>
+
+
+        <!-- ==============================
+             SETTINGS TAB
+        =============================== -->
+
+        <div
+            id="settingsTab"
+            class="teacher-tab-panel">
+
+
+            <div class="teacher-settings-area">
+
+                <div class="teacher-section-heading">
+
+                    <h2>
+                        ⚙️ Dojo Mart Settings
+                    </h2>
+
+                    <p>
+                        Store settings and pricing controls will live here.
+                    </p>
+
+                </div>
+
+
+                <div class="settings-coming-soon">
+
+                    <div>
+                        ⭐
+                    </div>
+
+                    <h3>
+                        Pricing & Store Settings
+                    </h3>
+
+                    <p>
+                        This is where you'll be able to
+                        change Dojo Point prices without
+                        editing the code.
+                    </p>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- =================================
+             ORDER DETAILS — RIGHT SIDE
+        ================================== -->
 
         <aside
             id="teacherOrderDetails"
@@ -1191,7 +1356,7 @@
             <div class="order-details-header">
 
                 <h2>
-                    Order Details
+                    🧾 Order Details
                 </h2>
 
 
@@ -1221,8 +1386,7 @@
                     </h3>
 
                     <p>
-                        Click a yellow order button
-                        to view the order.
+                        Click an order to view the details.
                     </p>
 
                 </div>
@@ -1234,17 +1398,6 @@
     </div>
 
 </section>
-
-
-<!-- =====================================
-     FIREBASE
-====================================== -->
-
-<script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-app-compat.js"></script>
-
-<script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-auth-compat.js"></script>
-
-<script src="script.js"></script>
 
 </body>
 </html>
