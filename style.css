@@ -2802,3 +2802,455 @@ button:active{
     z-index:4;
 
 }
+/* =========================================
+   TEACHER DASHBOARD TABS
+========================================= */
+
+.teacher-dashboard-tabs{
+
+    width:100%;
+
+    max-width:1500px;
+
+    margin:0 auto 15px;
+
+    display:flex;
+
+    justify-content:center;
+
+    gap:10px;
+
+    flex-wrap:wrap;
+
+}
+
+
+.teacher-tab{
+
+    border:none;
+
+    border-radius:15px;
+
+    padding:14px 25px;
+
+    min-height:55px;
+
+    background:rgba(255,255,255,.9);
+
+    color:#5936a3;
+
+    font-family:'Fredoka',sans-serif;
+
+    font-size:1.05rem;
+
+    font-weight:700;
+
+    cursor:pointer;
+
+    box-shadow:
+        0 4px 12px rgba(0,0,0,.12);
+
+    transition:
+        transform .2s ease,
+        background .2s ease;
+
+}
+
+
+.teacher-tab:hover{
+
+    transform:translateY(-2px);
+
+}
+
+
+.teacher-tab.active{
+
+    background:#ffd43b;
+
+    color:#503c00;
+
+}
+
+
+/* =========================================
+   TAB PANELS
+========================================= */
+
+.teacher-tab-panel{
+
+    display:none;
+
+    min-width:0;
+
+}
+
+
+.teacher-tab-panel.active-tab-panel{
+
+    display:block;
+
+}
+
+
+/* =========================================
+   STUDENT / ORDER CONTENT
+========================================= */
+
+.teacher-orders-area,
+.teacher-settings-area{
+
+    padding:25px;
+
+}
+
+
+.teacher-section-heading{
+
+    margin-bottom:20px;
+
+}
+
+
+.teacher-section-heading h2{
+
+    margin:0;
+
+    color:#5936a3;
+
+    font-size:2rem;
+
+}
+
+
+.teacher-section-heading p{
+
+    margin:6px 0 0;
+
+    color:#666;
+
+}
+
+
+/* =========================================
+   ORDER LIST
+========================================= */
+
+.teacher-orders-list{
+
+    display:flex;
+
+    flex-direction:column;
+
+    gap:12px;
+
+}
+
+
+.teacher-order-list-item{
+
+    width:100%;
+
+    border:2px solid #e4d8fa;
+
+    border-radius:16px;
+
+    background:white;
+
+    padding:15px 18px;
+
+    display:flex;
+
+    align-items:center;
+
+    justify-content:space-between;
+
+    gap:15px;
+
+    cursor:pointer;
+
+    font-family:'Fredoka',sans-serif;
+
+    transition:
+        transform .2s ease,
+        box-shadow .2s ease;
+
+}
+
+
+.teacher-order-list-item:hover{
+
+    transform:translateY(-2px);
+
+    box-shadow:
+        0 6px 16px rgba(0,0,0,.12);
+
+}
+
+
+.teacher-order-list-name{
+
+    font-size:1.15rem;
+
+    font-weight:700;
+
+    color:#5936a3;
+
+}
+
+
+.teacher-order-list-status{
+
+    font-weight:700;
+
+}
+
+
+.teacher-order-list-status.processing{
+
+    color:#a87800;
+
+}
+
+
+.teacher-order-list-status.completed{
+
+    color:#279144;
+
+}
+
+
+.teacher-order-list-view{
+
+    background:#ffd43b;
+
+    color:#503c00;
+
+    border:none;
+
+    border-radius:10px;
+
+    padding:10px 15px;
+
+    font-family:'Fredoka',sans-serif;
+
+    font-weight:700;
+
+    cursor:pointer;
+
+}
+
+
+/* =========================================
+   SETTINGS
+========================================= */
+
+.settings-coming-soon{
+
+    max-width:650px;
+
+    margin:30px auto;
+
+    padding:40px;
+
+    text-align:center;
+
+    background:white;
+
+    border:3px dashed #cdb8f3;
+
+    border-radius:25px;
+
+}
+
+
+.settings-coming-soon > div{
+
+    font-size:50px;
+
+}
+
+
+.settings-coming-soon h3{
+
+    color:#5936a3;
+
+    font-size:1.6rem;
+
+}
+
+
+.settings-coming-soon p{
+
+    color:#666;
+
+    font-size:1.05rem;
+
+}
+
+
+/* =========================================
+   INVENTORY TAB
+========================================= */
+
+.teacher-inventory-container{
+
+    width:100%;
+
+}
+
+
+.teacher-inventory-container
+.teacher-inventory-manager{
+
+    width:100%;
+
+    margin:0;
+
+    border-radius:0;
+
+    box-shadow:none;
+
+}
+
+
+/* =========================================
+   ORDER PANEL
+========================================= */
+
+.teacher-dashboard-shell{
+
+    position:relative;
+
+}
+
+
+.teacher-dashboard-shell:has(
+    .teacher-order-details:not(
+        .hidden-order-details
+    )
+){
+
+    grid-template-columns:
+        minmax(0,1.7fr)
+        minmax(360px,.8fr);
+
+}
+
+
+.teacher-order-details{
+
+    min-width:0;
+
+    max-height:
+        calc(100vh - 245px);
+
+    overflow-y:auto;
+
+}
+
+
+.teacher-order-details:not(
+    .hidden-order-details
+){
+
+    display:flex;
+
+    flex-direction:column;
+
+}
+
+
+/* =========================================
+   MOBILE / TABLET
+========================================= */
+
+@media(max-width:1100px){
+
+    .teacher-dashboard-shell{
+
+        display:block;
+
+    }
+
+
+    .teacher-order-details:not(
+        .hidden-order-details
+    ){
+
+        position:fixed;
+
+        z-index:10000;
+
+        top:50%;
+
+        left:50%;
+
+        transform:translate(
+            -50%,
+            -50%
+        );
+
+        width:min(
+            92vw,
+            600px
+        );
+
+        max-height:85vh;
+
+        border-radius:25px;
+
+        box-shadow:
+            0 20px 60px rgba(0,0,0,.35);
+
+    }
+
+}
+
+
+@media(max-width:600px){
+
+    .teacher-dashboard-tabs{
+
+        gap:6px;
+
+    }
+
+
+    .teacher-tab{
+
+        flex:1;
+
+        padding:12px 8px;
+
+        font-size:.9rem;
+
+        min-height:52px;
+
+    }
+
+
+    .teacher-orders-area,
+    .teacher-settings-area{
+
+        padding:15px;
+
+    }
+
+
+    .teacher-order-list-item{
+
+        flex-direction:column;
+
+        align-items:stretch;
+
+    }
+
+
+    .teacher-order-list-view{
+
+        width:100%;
+
+    }
+
+}
