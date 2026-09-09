@@ -329,19 +329,6 @@ const reopenStoreButton=
 const closeTeacherDashboardButton=
     $("closeTeacherDashboard");
 
-const phoneTeacherButton =
-    $("phoneTeacherButton");
-
-if(phoneTeacherButton){
-
-    phoneTeacherButton.addEventListener(
-        "click",
-        ()=>{
-            openTeacherDashboard();
-        }
-    );
-
-}
 
 /* =========================================
    TEACHER DASHBOARD TABS
