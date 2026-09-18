@@ -2628,6 +2628,15 @@ async function openShop(){
     );
 
 
+    /*
+       Reload the latest teacher price settings
+       before the student enters the shop.
+       This makes regular and special prices
+       appear immediately on the purchase screen.
+    */
+    await loadStoreSettings();
+
+
     await loadInventory();
 
 
@@ -2640,6 +2649,8 @@ async function openShop(){
         shopScreen
     );
 
+
+    updateShopPrices();
 
     updateCartDisplay();
 
