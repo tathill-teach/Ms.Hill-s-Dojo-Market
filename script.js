@@ -144,7 +144,7 @@ try{
 }
 
 
-const students=
+let students=
     defaultStudents.map(
         (student,index)=>({
 
@@ -744,6 +744,200 @@ function saveLocal(){
 
 
 /* =========================================
+   CLASS ROSTER
+========================================= */
+
+async function loadStudentRoster(){
+
+    try{
+
+        const roster=
+            await firebaseGet("studentRoster");
+
+        if(roster&&typeof roster==="object"){
+
+            Object.keys(roster).forEach(key=>{
+
+                const index=Number(key);
+                const saved=roster[key];
+
+                if(!Number.isInteger(index)||!saved)return;
+
+                if(!students[index]){
+
+                    students[index]={
+                        name:saved.name||("Student "+(index+1)),
+                        password:Array.isArray(saved.password)?saved.password:["dog","rocket"],
+                        points:Number(saved.points||0),
+                        active:saved.active!==false
+                    };
+
+                }else{
+
+                    if(saved.name)students[index].name=saved.name;
+
+                    if(Array.isArray(saved.password)){
+                        students[index].password=saved.password;
+                    }
+
+                    students[index].active=saved.active!==false;
+
+                }
+
+            });
+
+        }
+
+        students.forEach(student=>{
+            if(student.active===undefined)student.active=true;
+        });
+
+        renderStudentGrid();
+
+    }catch(error){
+
+        console.error("Student roster loading error:",error);
+
+    }
+
+}
+
+
+async function saveStudentRoster(){
+
+    const roster={};
+
+    students.forEach((student,index)=>{
+        roster[index]={
+            name:student.name,
+            password:Array.isArray(student.password)?student.password:["dog","rocket"],
+            points:Number(student.points||0),
+            active:student.active!==false
+        };
+    });
+
+    const saved=
+        await firebasePut("studentRoster",roster);
+
+    return saved;
+
+}
+
+
+function renderStudentGrid(){
+
+    if(!studentScreen)return;
+
+    const grid=studentScreen.querySelector(".student-grid");
+    if(!grid)return;
+
+    grid.innerHTML="";
+
+    students.forEach((student,index)=>{
+
+        if(student.active===false)return;
+
+        const button=document.createElement("button");
+        button.type="button";
+        button.className="student-bubble";
+        button.dataset.studentIndex=index;
+
+        const oldButton=studentButtons[index];
+        const oldImage=oldButton?oldButton.querySelector("img"):null;
+        const image=document.createElement("img");
+        image.className="student-photo";
+        image.src=oldImage?oldImage.src:"assets/images/student-placeholder.png";
+        image.alt=student.name;
+
+        const label=document.createElement("span");
+        label.textContent=student.name;
+
+        button.append(image,label);
+        grid.appendChild(button);
+
+    });
+
+}
+
+
+async function addStudentFromTeacher(name,password,points){
+
+    students.push({
+        name:name.trim(),
+        password:[...password],
+        points:Number(points)||0,
+        active:true
+    });
+
+    const saved=await saveStudentRoster();
+
+    if(!saved){
+        students.pop();
+        return false;
+    }
+
+    renderStudentGrid();
+    renderTeacherTable();
+    return true;
+
+}
+
+
+async function editStudentFromTeacher(index,name,password,points){
+
+    const student=students[index];
+    if(!student)return false;
+
+    const old={
+        name:student.name,
+        password:[...student.password],
+        points:student.points
+    };
+
+    student.name=name.trim();
+    student.password=[...password];
+    student.points=Number(points)||0;
+
+    const saved=await saveStudentRoster();
+
+    if(!saved){
+        student.name=old.name;
+        student.password=old.password;
+        student.points=old.points;
+        return false;
+    }
+
+    renderStudentGrid();
+    renderTeacherTable();
+    return true;
+
+}
+
+
+async function toggleStudentActive(index){
+
+    const student=students[index];
+    if(!student)return false;
+
+    const old=student.active!==false;
+    student.active=!old;
+
+    const saved=await saveStudentRoster();
+
+    if(!saved){
+        student.active=old;
+        return false;
+    }
+
+    renderStudentGrid();
+    renderTeacherTable();
+    renderTeacherOrders();
+    return true;
+
+}
+
+
+/* =========================================
    SCREEN HELPERS
 ========================================= */
 
@@ -1051,7 +1245,138 @@ function isManuallyOutOfStock(
    TEACHER SETTINGS
 ========================================= */
 
+function renderTeacherRoster(){
+
+    const list=$("teacherRosterList");
+    const form=$("addStudentForm");
+
+    if(!list)return;
+
+    list.innerHTML="";
+
+    students.forEach((student,index)=>{
+
+        const row=document.createElement("div");
+        row.className="teacher-roster-row";
+
+        const fields=document.createElement("div");
+        fields.className="teacher-roster-fields";
+
+        const nameInput=document.createElement("input");
+        nameInput.type="text";
+        nameInput.className="teacher-roster-name";
+        nameInput.value=student.name;
+
+        const pointsInput=document.createElement("input");
+        pointsInput.type="number";
+        pointsInput.min="0";
+        pointsInput.className="teacher-roster-points";
+        pointsInput.value=Number(student.points||0);
+
+        const passwordText=document.createElement("span");
+        passwordText.className="teacher-roster-password";
+        passwordText.textContent="🔐 "+(student.password||[]).join(" + ");
+
+        const status=document.createElement("span");
+        status.className="teacher-roster-status";
+        status.textContent=student.active===false?"🔴 Removed":"🟢 Active";
+
+        fields.append(nameInput,pointsInput,passwordText,status);
+
+        const actions=document.createElement("div");
+        actions.className="teacher-roster-actions";
+
+        const save=document.createElement("button");
+        save.type="button";
+        save.className="teacher-roster-save";
+        save.textContent="💾 Save";
+
+        save.onclick=async()=>{
+
+            const name=nameInput.value.trim();
+            if(!name){alert("Please enter a student name.");return;}
+
+            const saved=await editStudentFromTeacher(
+                index,
+                name,
+                student.password,
+                Number(pointsInput.value)||0
+            );
+
+            if(saved)renderTeacherRoster();
+            else alert("⚠️ Student could not be saved.");
+
+        };
+
+        const toggle=document.createElement("button");
+        toggle.type="button";
+        toggle.className="teacher-roster-remove";
+        toggle.textContent=student.active===false?"↩️ Restore":"🗑️ Remove";
+
+        toggle.onclick=async()=>{
+
+            if(student.active!==false){
+                if(!confirm("Remove "+student.name+" from the class list?"))return;
+            }
+
+            const saved=await toggleStudentActive(index);
+
+            if(saved)renderTeacherRoster();
+            else alert("⚠️ Student roster could not be updated.");
+
+        };
+
+        actions.append(save,toggle);
+        row.append(fields,actions);
+        list.appendChild(row);
+
+    });
+
+    if(form&&!form.dataset.bound){
+
+        form.dataset.bound="true";
+
+        form.addEventListener("submit",async event=>{
+
+            event.preventDefault();
+
+            const name=form.querySelector(".add-student-name").value.trim();
+            const points=Number(form.querySelector(".add-student-points").value)||0;
+            const selected=[...form.querySelectorAll(".add-student-password.selected")];
+            const password=selected.map(button=>button.dataset.icon);
+
+            if(!name){alert("Please enter a student name.");return;}
+            if(password.length!==2){alert("Choose exactly 2 password pictures.");return;}
+
+            const saved=await addStudentFromTeacher(name,password,points);
+
+            if(!saved){alert("⚠️ Student could not be added.");return;}
+
+            form.reset();
+            form.querySelectorAll(".add-student-password.selected").forEach(button=>button.classList.remove("selected"));
+            renderTeacherRoster();
+
+        });
+
+        form.querySelectorAll(".add-student-password").forEach(button=>{
+            button.addEventListener("click",()=>{
+                if(button.classList.contains("selected")){
+                    button.classList.remove("selected");
+                    return;
+                }
+                if(form.querySelectorAll(".add-student-password.selected").length>=2)return;
+                button.classList.add("selected");
+            });
+        });
+
+    }
+
+}
+
+
 function renderTeacherSettings(){
+
+    renderTeacherRoster();
 
     const pricingList=
         $("teacherPricingList");
@@ -2056,52 +2381,26 @@ function openDojoMart(){
    STUDENT SELECTION
 ========================================= */
 
-studentButtons.forEach(
-    (button,index)=>{
+studentScreen.addEventListener("click",event=>{
 
-        button.addEventListener(
-            "click",
-            ()=>{
+    const button=event.target.closest(".student-bubble");
+    if(!button)return;
 
-                // Remember which student was clicked
-                currentStudentIndex = index;
+    const index=Number(button.dataset.studentIndex);
 
+    if(!Number.isInteger(index)||!students[index]||students[index].active===false)return;
 
-                // Always start with a fresh password
-                selectedPasswordIcons = [];
+    currentStudentIndex=index;
+    selectedPasswordIcons=[];
 
+    passwordIcons.forEach(icon=>icon.classList.remove("selected"));
+    passwordStatus.textContent="Choose 2 pictures";
 
-                // Remove any old selections
-                passwordIcons.forEach(
-                    icon=>{
-                        icon.classList.remove(
-                            "selected"
-                        );
-                    }
-                );
+    hideScreen(studentScreen);
+    showScreen(loginScreen);
 
+});
 
-                // Reset the message
-                passwordStatus.textContent =
-                    "Choose 2 pictures";
-
-
-                // Hide student selection
-                hideScreen(
-                    studentScreen
-                );
-
-
-                // SHOW PASSWORD SCREEN
-                showScreen(
-                    loginScreen
-                );
-
-            }
-        );
-
-    }
-);
 /* =========================================
    PASSWORD ICONS
 ========================================= */
@@ -3282,6 +3581,12 @@ function renderTeacherTable(){
 
     students.forEach(
         (student,index)=>{
+
+            if(student.active===false){
+
+                return;
+
+            }
 
             const order=
                 studentOrders[index];
@@ -4590,7 +4895,8 @@ function renderTeacherOrders(){
             )
             .filter(
                 item=>
-                    item.order
+                    item.order&&
+                    item.student.active!==false
             );
 
 
@@ -4749,6 +5055,8 @@ async function openTeacherDashboard(){
 
 
     await refreshAll();
+
+    await loadStudentRoster();
 
 renderTeacherTable();
 
@@ -5261,7 +5569,9 @@ setupShopButtons();
 
     await loadStoreSettings();
 
-await refreshAll();
+await loadStudentRoster();
+
+    await refreshAll();
 
 updateShopPrices();
 
