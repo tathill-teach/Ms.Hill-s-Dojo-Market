@@ -167,6 +167,10 @@ let cartItems=[];
 
 let inventory={};
 
+let storePrices={};
+
+let storeOutOfStock={};
+
 let loadingData=false;
 
 
