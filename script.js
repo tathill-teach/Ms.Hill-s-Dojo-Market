@@ -959,7 +959,6 @@ function changeStudentPhoto(index){
 
     input.type="file";
     input.accept="image/*";
-    input.setAttribute("capture","environment");
 
     // Keep the file picker usable on phones/tablets while
     // keeping the input itself invisible.
