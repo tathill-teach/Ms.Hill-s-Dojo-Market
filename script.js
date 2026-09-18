@@ -2432,11 +2432,53 @@ async function refreshStudent(index){
 
         saveLocal();
 
-        return true;
+    }
+
+
+    /*
+       Repair an order if the student's device still has
+       the complete receipt locally but Firebase has an
+       incomplete/empty copy. This lets the student's
+       successful checkout repair the teacher's order view.
+    */
+    const localOrder=
+        studentOrders[index];
+
+    if(
+        localOrder&&
+        Array.isArray(localOrder.items)&&
+        localOrder.items.length>0
+    ){
+
+        const onlineOrder=
+            await firebaseGet(
+                `orders/${index}`
+            );
+
+        const onlineHasItems=
+            onlineOrder&&
+            Array.isArray(onlineOrder.items)&&
+            onlineOrder.items.length>0;
+
+        if(!onlineHasItems){
+
+            await saveOrderOnline(
+                index,
+                localOrder
+            );
+
+        }else{
+
+            studentOrders[index]=
+                onlineOrder;
+
+            saveLocal();
+
+        }
 
     }
 
-    return false;
+    return true;
 
 }
 
@@ -3813,6 +3855,30 @@ function showReceipt(){
 
 
     if(!order)return;
+
+    /*
+       The receipt is the authoritative local copy of the
+       student's successful checkout. If Firebase somehow
+       has an incomplete order, repair it in the background
+       immediately so Ms. Hill can see the purchased items.
+    */
+    if(
+        Array.isArray(order.items)&&
+        order.items.length>0
+    ){
+
+        saveOrderOnline(
+            currentStudentIndex,
+            order
+        ).catch(
+            error=>
+                console.error(
+                    "Order repair error:",
+                    error
+                )
+        );
+
+    }
 
 
     const fulfilled=
