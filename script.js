@@ -1369,14 +1369,31 @@ function getStoreItems(){
 
                 }
 
-                items[name]={
+                const savedPrice=
+    Number(
+        storePrices[name]
+    );
 
-                    name:name,
 
-                    price:
-                        Number(match[0])
+const price=
+    Number.isFinite(
+        savedPrice
+    )
+        ? savedPrice
+        : Number(match[0]);
 
-                };
+
+priceText.textContent=
+    `⭐ ${price} Dojo Points`;
+
+
+items[name]={
+
+    name:name,
+
+    price:price
+
+};
 
             }
         );
@@ -2203,7 +2220,10 @@ function updateShopAffordability(){
                     );
 
 
-                if(stock<=0){
+                if(
+    stock<=0||
+    isManuallyOutOfStock(name)
+){
 
                     card.classList.add(
                         "out-of-stock"
@@ -2621,8 +2641,9 @@ async function checkoutOrder(){
     ){
 
         if(
-            qty(item.name)<=0
-        ){
+    qty(item.name)<=0||
+    isManuallyOutOfStock(item.name)
+){
 
             alert(
                 `${item.name} is out of stock.`
@@ -4498,6 +4519,8 @@ renderTeacherOrders();
 
 renderInventory();
 
+renderTeacherSettings();
+
 showScreen(
     teacherDashboard
 );
@@ -4999,7 +5022,11 @@ setupShopButtons();
     await startAuth();
 
 
-    await refreshAll();
+    await loadStoreSettings();
+
+await refreshAll();
+
+updateShopPrices();
 
 
     loadingData=false;
