@@ -171,6 +171,8 @@ let storePrices={};
 
 let storeOutOfStock={};
 
+let storeSpecialPrices={};
+
 let loadingData=false;
 
 
@@ -801,6 +803,13 @@ async function loadStoreSettings(){
                 )||"{}"
             );
 
+        const localSpecialPrices=
+            JSON.parse(
+                localStorage.getItem(
+                    "dojoMarketSpecialPrices"
+                )||"{}"
+            );
+
 
         if(
             localPrices&&
@@ -820,6 +829,16 @@ async function loadStoreSettings(){
 
             storeOutOfStock=
                 localOutOfStock;
+
+        }
+
+        if(
+            localSpecialPrices&&
+            typeof localSpecialPrices==="object"
+        ){
+
+            storeSpecialPrices=
+                localSpecialPrices;
 
         }
 
@@ -856,6 +875,16 @@ async function loadStoreSettings(){
 
             }
 
+            if(
+                onlineSettings.specialPrices&&
+                typeof onlineSettings.specialPrices==="object"
+            ){
+
+                storeSpecialPrices=
+                    onlineSettings.specialPrices;
+
+            }
+
         }
 
 
@@ -883,7 +912,8 @@ async function saveStoreSettings(){
         "storeSettings",
         {
             prices:storePrices,
-            outOfStock:storeOutOfStock
+            outOfStock:storeOutOfStock,
+            specialPrices:storeSpecialPrices
         }
     );
 
@@ -932,6 +962,77 @@ async function saveStoreAvailability(
     return await firebasePut(
         `storeSettings/outOfStock/${safeName}`,
         Boolean(outOfStock)
+    );
+
+}
+
+function getCurrentMonthEndTimestamp(){
+
+    const now=new Date();
+
+    return new Date(
+        now.getFullYear(),
+        now.getMonth()+1,
+        0,
+        23,
+        59,
+        59,
+        999
+    ).getTime();
+
+}
+
+
+function getEffectivePrice(name,fallbackPrice){
+
+    const special=storeSpecialPrices[name];
+
+    if(
+        special&&
+        Number.isFinite(Number(special.price))&&
+        Number(special.expiresAt)>Date.now()
+    ){
+
+        return Number(special.price);
+
+    }
+
+    if(special&&Number(special.expiresAt)<=Date.now()){
+
+        delete storeSpecialPrices[name];
+
+    }
+
+    return Number(fallbackPrice);
+
+}
+
+
+async function saveSpecialPrice(name,price){
+
+    const record={
+        price:Number(price),
+        expiresAt:getCurrentMonthEndTimestamp()
+    };
+
+    storeSpecialPrices[name]=record;
+    saveLocal();
+
+    return await firebasePut(
+        `storeSettings/specialPrices/${encodeURIComponent(name)}`,
+        record
+    );
+
+}
+
+
+async function clearSpecialPrice(name){
+
+    delete storeSpecialPrices[name];
+    saveLocal();
+
+    return await firebaseDelete(
+        `storeSettings/specialPrices/${encodeURIComponent(name)}`
     );
 
 }
@@ -1145,6 +1246,79 @@ function renderTeacherSettings(){
                     };
 
 
+                const specialWrap=document.createElement("div");
+                specialWrap.className="teacher-special-price-controls";
+
+                const specialInput=document.createElement("input");
+                specialInput.type="number";
+                specialInput.min="0";
+                specialInput.step="1";
+                specialInput.placeholder="Special";
+                specialInput.className="teacher-special-price-input";
+
+                const activeSpecial=storeSpecialPrices[name];
+
+                if(activeSpecial&&Number(activeSpecial.expiresAt)>Date.now()){
+                    specialInput.value=Number(activeSpecial.price);
+                }
+
+                const specialSave=document.createElement("button");
+                specialSave.type="button";
+                specialSave.className="teacher-special-price-save";
+                specialSave.textContent="🔥 Save Special";
+
+                const specialClear=document.createElement("button");
+                specialClear.type="button";
+                specialClear.className="teacher-special-price-clear";
+                specialClear.textContent="Clear";
+
+                specialWrap.append(specialInput,specialSave,specialClear);
+
+                specialSave.onclick=async()=>{
+
+                    const value=Math.floor(Number(specialInput.value));
+
+                    if(!Number.isFinite(value)||value<0){
+                        alert("Please enter a whole number 0 or greater.");
+                        specialInput.focus();
+                        return;
+                    }
+
+                    specialSave.disabled=true;
+                    specialSave.textContent="⏳ Saving...";
+
+                    const saved=await saveSpecialPrice(name,value);
+
+                    if(saved){
+                        specialSave.textContent="✅ Saved!";
+                        updateShopPrices();
+                        setTimeout(()=>renderTeacherSettings(),700);
+                    }else{
+                        delete storeSpecialPrices[name];
+                        specialSave.disabled=false;
+                        specialSave.textContent="🔥 Save Special";
+                        alert("⚠️ Special price could not be saved. Please try again.");
+                    }
+
+                };
+
+                specialClear.onclick=async()=>{
+
+                    specialClear.disabled=true;
+                    const saved=await clearSpecialPrice(name);
+
+                    if(saved){
+                        updateShopPrices();
+                        renderTeacherSettings();
+                    }else{
+                        specialClear.disabled=false;
+                        alert("⚠️ Special price could not be cleared.");
+                    }
+
+                };
+
+                priceCard.querySelector(".teacher-price-controls").appendChild(specialWrap);
+
                 pricingList.appendChild(
                     priceCard
                 );
@@ -1332,18 +1506,22 @@ function updateShopPrices(){
                     );
 
 
-                const price=
-                    Number.isFinite(
-                        savedPrice
-                    )
-                        ? savedPrice
-                        : (
-                            defaultMatch
-                                ? Number(
-                                    defaultMatch[0]
-                                )
-                                : 0
-                        );
+                const regularPrice=
+        Number.isFinite(
+            savedPrice
+        )
+            ? savedPrice
+            : (
+                defaultMatch
+                    ? Number(defaultMatch[0])
+                    : 0
+            );
+
+    const price=
+        getEffectivePrice(
+            name,
+            regularPrice
+        );
 
 
                 priceText.textContent=
@@ -1428,12 +1606,18 @@ function getStoreItems(){
     );
 
 
-const price=
+const regularPrice=
     Number.isFinite(
         savedPrice
     )
         ? savedPrice
         : Number(match[0]);
+
+const price=
+    getEffectivePrice(
+        name,
+        regularPrice
+    );
 
 
 priceText.textContent=
