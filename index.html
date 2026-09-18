@@ -1326,66 +1326,88 @@
             id="settingsTab"
             class="teacher-tab-panel">
 
-
             <div class="teacher-settings-area">
 
-                <div class="teacher-section-heading">
+                <div class="teacher-settings-header">
 
-                    <h2>
-                        ⚙️ Dojo Mart Settings
-                    </h2>
+                    <div>
+                        <h2>
+                            ⚙️ Dojo Mart Settings
+                        </h2>
 
-                    <p>
-                        Store settings and pricing controls will live here.
-                    </p>
+                        <p>
+                            Manage treasure prices and availability.
+                        </p>
+                    </div>
 
                 </div>
 
 
-                <div class="dojo-settings-manager">
+                <!-- ==========================
+                     PRICING
+                =========================== -->
 
-    <div class="settings-manager-header">
+                <div class="settings-section">
 
-        <div>
-            <h3>
-                ⭐ Treasure Prices
-            </h3>
+                    <div class="settings-section-title">
 
-            <p>
-                Change how many Dojo Points each treasure costs.
-            </p>
-        </div>
+                        <div class="settings-section-icon">
+                            ⭐
+                        </div>
 
-    </div>
+                        <div>
+                            <h3>
+                                Treasure Prices
+                            </h3>
 
+                            <p>
+                                Change how many Dojo Points each treasure costs.
+                            </p>
+                        </div>
 
-    <div
-        id="teacherPricingList"
-        class="teacher-pricing-list">
-    </div>
-
-
-    <div class="settings-manager-header availability-header">
-
-        <div>
-            <h3>
-                📦 Treasure Availability
-            </h3>
-
-            <p>
-                Temporarily hide a treasure from students without changing the inventory amount.
-            </p>
-        </div>
-
-    </div>
+                    </div>
 
 
-    <div
-        id="teacherAvailabilityList"
-        class="teacher-pricing-list">
-    </div>
+                    <div
+                        id="teacherPricingList"
+                        class="teacher-pricing-list">
+                    </div>
 
-</div>
+                </div>
+
+
+                <!-- ==========================
+                     AVAILABILITY
+                =========================== -->
+
+                <div class="settings-section availability-settings-section">
+
+                    <div class="settings-section-title">
+
+                        <div class="settings-section-icon">
+                            📦
+                        </div>
+
+                        <div>
+                            <h3>
+                                Treasure Availability
+                            </h3>
+
+                            <p>
+                                Temporarily remove a treasure from the student store without changing its inventory.
+                            </p>
+                        </div>
+
+                    </div>
+
+
+                    <div
+                        id="teacherAvailabilityList"
+                        class="teacher-pricing-list">
+                    </div>
+
+                </div>
+
             </div>
 
         </div>
