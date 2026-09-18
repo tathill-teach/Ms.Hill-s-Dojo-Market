@@ -778,6 +778,551 @@ function showScreen(screen){
 
 }
 
+/* =========================================
+   STORE PRICES & AVAILABILITY
+========================================= */
+
+async function loadStoreSettings(){
+
+    try{
+
+        const localPrices=
+            JSON.parse(
+                localStorage.getItem(
+                    "dojoMarketStorePrices"
+                )||"{}"
+            );
+
+
+        const localOutOfStock=
+            JSON.parse(
+                localStorage.getItem(
+                    "dojoMarketStoreOutOfStock"
+                )||"{}"
+            );
+
+
+        if(
+            localPrices&&
+            typeof localPrices==="object"
+        ){
+
+            storePrices=
+                localPrices;
+
+        }
+
+
+        if(
+            localOutOfStock&&
+            typeof localOutOfStock==="object"
+        ){
+
+            storeOutOfStock=
+                localOutOfStock;
+
+        }
+
+
+        const onlineSettings=
+            await firebaseGet(
+                "storeSettings"
+            );
+
+
+        if(
+            onlineSettings&&
+            typeof onlineSettings==="object"
+        ){
+
+            if(
+                onlineSettings.prices&&
+                typeof onlineSettings.prices==="object"
+            ){
+
+                storePrices=
+                    onlineSettings.prices;
+
+            }
+
+
+            if(
+                onlineSettings.outOfStock&&
+                typeof onlineSettings.outOfStock==="object"
+            ){
+
+                storeOutOfStock=
+                    onlineSettings.outOfStock;
+
+            }
+
+        }
+
+
+        saveLocal();
+
+
+    }catch(error){
+
+        console.error(
+            "Store settings loading error:",
+            error
+        );
+
+    }
+
+}
+
+
+async function saveStoreSettings(){
+
+    saveLocal();
+
+
+    return await firebasePut(
+        "storeSettings",
+        {
+            prices:storePrices,
+            outOfStock:storeOutOfStock
+        }
+    );
+
+}
+
+
+function isManuallyOutOfStock(
+    itemName
+){
+
+    return storeOutOfStock[itemName]===true;
+
+}
+
+
+/* =========================================
+   TEACHER SETTINGS
+========================================= */
+
+function renderTeacherSettings(){
+
+    const pricingList=
+        $("teacherPricingList");
+
+    const availabilityList=
+        $("teacherAvailabilityList");
+
+
+    if(
+        !pricingList||
+        !availabilityList
+    ){
+
+        return;
+
+    }
+
+
+    const items=
+        getStoreItems();
+
+
+    pricingList.innerHTML="";
+    availabilityList.innerHTML="";
+
+
+    Object.entries(items)
+        .forEach(
+            ([name,item])=>{
+
+
+                /* =========================
+                   PRICE CONTROL
+                ========================= */
+
+                const priceCard=
+                    document.createElement(
+                        "div"
+                    );
+
+                priceCard.className=
+                    "teacher-price-card";
+
+
+                priceCard.innerHTML=
+                    `
+                    <div class="teacher-price-name">
+
+                        <strong>
+                            ${name}
+                        </strong>
+
+                        <span>
+                            Current: ⭐ ${item.price}
+                        </span>
+
+                    </div>
+
+                    <div class="teacher-price-controls">
+
+                        <span>⭐</span>
+
+                        <input
+                            type="number"
+                            min="0"
+                            step="1"
+                            value="${item.price}"
+                            class="teacher-price-input"
+                        >
+
+                        <button
+                            type="button"
+                            class="teacher-price-save"
+                        >
+                            💾 Save Price
+                        </button>
+
+                    </div>
+                    `;
+
+
+                const priceInput=
+                    priceCard.querySelector(
+                        ".teacher-price-input"
+                    );
+
+
+                const priceSave=
+                    priceCard.querySelector(
+                        ".teacher-price-save"
+                    );
+
+
+                priceSave.onclick=
+                    async()=>{
+
+                        const newPrice=
+                            Math.floor(
+                                Number(
+                                    priceInput.value
+                                )
+                            );
+
+
+                        if(
+                            !Number.isFinite(
+                                newPrice
+                            )||
+                            newPrice<0
+                        ){
+
+                            alert(
+                                "Please enter a whole number 0 or greater."
+                            );
+
+                            priceInput.focus();
+
+                            return;
+
+                        }
+
+
+                        const oldPrice=
+                            storePrices[name];
+
+
+                        storePrices[name]=
+                            newPrice;
+
+
+                        priceSave.disabled=
+                            true;
+
+                        priceSave.textContent=
+                            "⏳ Saving...";
+
+
+                        const saved=
+                            await saveStoreSettings();
+
+
+                        priceSave.disabled=
+                            false;
+
+
+                        if(saved){
+
+                            priceSave.textContent=
+                                "✅ Saved!";
+
+
+                            setTimeout(
+                                ()=>{
+                                    renderTeacherSettings();
+                                },
+                                700
+                            );
+
+
+                            updateShopPrices();
+
+                        }else{
+
+                            if(
+                                oldPrice===
+                                undefined
+                            ){
+
+                                delete storePrices[name];
+
+                            }else{
+
+                                storePrices[name]=
+                                    oldPrice;
+
+                            }
+
+
+                            priceSave.textContent=
+                                "💾 Save Price";
+
+
+                            alert(
+                                "⚠️ Price could not be saved. Please try again."
+                            );
+
+                        }
+
+                    };
+
+
+                pricingList.appendChild(
+                    priceCard
+                );
+
+
+                /* =========================
+                   AVAILABILITY CONTROL
+                ========================= */
+
+                const availabilityCard=
+                    document.createElement(
+                        "div"
+                    );
+
+                availabilityCard.className=
+                    "teacher-price-card";
+
+
+                const outOfStock=
+                    isManuallyOutOfStock(
+                        name
+                    );
+
+
+                availabilityCard.innerHTML=
+                    `
+                    <div class="teacher-price-name">
+
+                        <strong>
+                            ${name}
+                        </strong>
+
+                        <span class="${
+                            outOfStock
+                                ? "settings-status-out"
+                                : "settings-status-in"
+                        }">
+
+                            ${
+                                outOfStock
+                                    ? "🔴 Currently Out of Stock"
+                                    : "🟢 Currently Available"
+                            }
+
+                        </span>
+
+                    </div>
+
+                    <div class="teacher-price-controls">
+
+                        <button
+                            type="button"
+                            class="teacher-availability-button"
+                        >
+
+                            ${
+                                outOfStock
+                                    ? "🟢 Put Back In Stock"
+                                    : "🔴 Mark Out of Stock"
+                            }
+
+                        </button>
+
+                    </div>
+                    `;
+
+
+                const availabilityButton=
+                    availabilityCard.querySelector(
+                        ".teacher-availability-button"
+                    );
+
+
+                availabilityButton.onclick=
+                    async()=>{
+
+                        const oldValue=
+                            storeOutOfStock[name]===true;
+
+
+                        storeOutOfStock[name]=
+                            !oldValue;
+
+
+                        availabilityButton.disabled=
+                            true;
+
+
+                        availabilityButton.textContent=
+                            "⏳ Saving...";
+
+
+                        const saved=
+                            await saveStoreSettings();
+
+
+                        if(saved){
+
+                            updateShopPrices();
+
+                            renderTeacherSettings();
+
+                        }else{
+
+                            storeOutOfStock[name]=
+                                oldValue;
+
+
+                            availabilityButton.disabled=
+                                false;
+
+
+                            alert(
+                                "⚠️ Availability could not be saved. Please try again."
+                            );
+
+                        }
+
+                    };
+
+
+                availabilityList.appendChild(
+                    availabilityCard
+                );
+
+            }
+        );
+
+}
+
+
+/* =========================================
+   UPDATE SHOP PRICES / STOCK
+========================================= */
+
+function updateShopPrices(){
+
+    qa(".reward-card")
+        .forEach(
+            card=>{
+
+                const title=
+                    card.querySelector(
+                        "h3"
+                    );
+
+                const priceText=
+                    card.querySelector(
+                        "p"
+                    );
+
+                const button=
+                    card.querySelector(
+                        ".buy-btn"
+                    );
+
+
+                if(
+                    !title||
+                    !priceText||
+                    !button
+                ){
+
+                    return;
+
+                }
+
+
+                const name=
+                    title.textContent.trim();
+
+
+                const defaultMatch=
+                    priceText.textContent.match(
+                        /\d+/
+                    );
+
+
+                const savedPrice=
+                    Number(
+                        storePrices[name]
+                    );
+
+
+                const price=
+                    Number.isFinite(
+                        savedPrice
+                    )
+                        ? savedPrice
+                        : (
+                            defaultMatch
+                                ? Number(
+                                    defaultMatch[0]
+                                )
+                                : 0
+                        );
+
+
+                priceText.textContent=
+                    `⭐ ${price} Dojo Points`;
+
+
+                if(
+                    isManuallyOutOfStock(
+                        name
+                    )||
+                    qty(name)<=0
+                ){
+
+                    card.classList.add(
+                        "out-of-stock"
+                    );
+
+                    button.disabled=
+                        true;
+
+                    button.textContent=
+                        "Out of Stock";
+
+                }
+
+            }
+        );
+
+
+    updateShopAffordability();
+
+}
 
 /* =========================================
    STORE ITEM LIST
