@@ -769,7 +769,8 @@ async function loadStudentRoster(){
                         name:saved.name||("Student "+(index+1)),
                         password:Array.isArray(saved.password)?saved.password:["dog","rocket"],
                         points:Number(saved.points||0),
-                        active:saved.active!==false
+                        active:saved.active!==false,
+                        photo:saved.photo||""
                     };
 
                 }else{
@@ -781,6 +782,10 @@ async function loadStudentRoster(){
                     }
 
                     students[index].active=saved.active!==false;
+
+                    if(saved.photo){
+                        students[index].photo=saved.photo;
+                    }
 
                 }
 
@@ -812,7 +817,8 @@ async function saveStudentRoster(){
             name:student.name,
             password:Array.isArray(student.password)?student.password:["dog","rocket"],
             points:Number(student.points||0),
-            active:student.active!==false
+            active:student.active!==false,
+            photo:student.photo||""
         };
     });
 
@@ -846,7 +852,9 @@ function renderStudentGrid(){
         const oldImage=oldButton?oldButton.querySelector("img"):null;
         const image=document.createElement("img");
         image.className="student-photo";
-        image.src=oldImage?oldImage.src:"assets/images/student-placeholder.png";
+        image.src=
+            student.photo||
+            (oldImage?oldImage.src:"assets/images/student-placeholder.png");
         image.alt=student.name;
 
         const label=document.createElement("span");
@@ -859,6 +867,114 @@ function renderStudentGrid(){
 
 }
 
+
+function getDefaultStudentPhoto(index){
+
+    const oldButton=studentButtons[index];
+    const oldImage=oldButton ? oldButton.querySelector("img") : null;
+
+    return oldImage ? oldImage.src : "assets/images/student-placeholder.png";
+
+}
+
+function getStudentPhoto(index){
+
+    return students[index]?.photo || getDefaultStudentPhoto(index);
+
+}
+
+function compressStudentPhoto(file){
+
+    return new Promise((resolve,reject)=>{
+
+        const reader=new FileReader();
+
+        reader.onload=()=>{
+
+            const image=new Image();
+
+            image.onload=()=>{
+
+                const maxSize=500;
+                let width=image.naturalWidth;
+                let height=image.naturalHeight;
+
+                if(width>height){
+                    if(width>maxSize){
+                        height=Math.round(height*maxSize/width);
+                        width=maxSize;
+                    }
+                }else if(height>maxSize){
+                    width=Math.round(width*maxSize/height);
+                    height=maxSize;
+                }
+
+                const canvas=document.createElement("canvas");
+                canvas.width=width;
+                canvas.height=height;
+
+                const context=canvas.getContext("2d");
+                context.drawImage(image,0,0,width,height);
+
+                resolve(canvas.toDataURL("image/jpeg",0.82));
+
+            };
+
+            image.onerror=()=>reject(new Error("Image could not be read."));
+            image.src=reader.result;
+
+        };
+
+        reader.onerror=()=>reject(new Error("Image could not be read."));
+        reader.readAsDataURL(file);
+
+    });
+
+}
+
+async function changeStudentPhoto(index){
+
+    const student=students[index];
+    if(!student)return;
+
+    const input=document.createElement("input");
+    input.type="file";
+    input.accept="image/*";
+    input.style.display="none";
+    document.body.appendChild(input);
+
+    input.onchange=async()=>{
+
+        const file=input.files?.[0];
+        if(!file){ input.remove(); return; }
+
+        try{
+            const oldPhoto=student.photo||"";
+            student.photo=await compressStudentPhoto(file);
+
+            const saved=await saveStudentRoster();
+
+            if(!saved){
+                student.photo=oldPhoto;
+                alert("⚠️ The photo could not be saved. Please try again.");
+                input.remove();
+                return;
+            }
+
+            renderStudentGrid();
+            renderTeacherTable();
+
+        }catch(error){
+            console.error("Student photo error:",error);
+            alert("⚠️ The photo could not be added. Please try another image.");
+        }
+
+        input.remove();
+    };
+
+    input.click();
+
+}
 
 async function addStudentFromTeacher(name,password,points){
 
@@ -3260,6 +3376,27 @@ function createCheckoutButton(){
    CHECKOUT
 ========================================= */
 
+async function saveOrderOnline(studentIndex,order){
+
+    const directSaved=await firebasePut(
+        `orders/${studentIndex}`,
+        order
+    );
+
+    if(directSaved)return true;
+
+    const onlineOrders=await firebaseGet("orders");
+    const mergedOrders=
+        onlineOrders&&typeof onlineOrders==="object"
+            ? {...onlineOrders}
+            : {};
+
+    mergedOrders[String(studentIndex)]=order;
+
+    return await firebasePut("orders",mergedOrders);
+
+}
+
 async function checkoutOrder(){
 
     if(
@@ -3438,8 +3575,8 @@ async function checkoutOrder(){
 
 
     const orderSaved=
-        await firebasePut(
-            `orders/${currentStudentIndex}`,
+        await saveOrderOnline(
+            currentStudentIndex,
             order
         );
 
@@ -3755,11 +3892,15 @@ function renderTeacherTable(){
                         teacher-student-name
                     ">
 
-                        <div class="
-                            teacher-student-avatar
-                        ">
-                            👤
-                        </div>
+                        <button
+                            type="button"
+                            class="teacher-student-avatar teacher-photo-button"
+                            title="Click to change photo"
+                            data-photo-index="${index}">
+                            <img
+                                src="${getStudentPhoto(index)}"
+                                alt="${student.name}">
+                        </button>
 
                         <span>
                             ${student.name}
@@ -3770,6 +3911,19 @@ function renderTeacherTable(){
                 </td>
 
                 `;
+
+
+            const photoButton=
+                row.querySelector(
+                    ".teacher-photo-button"
+                );
+
+            if(photoButton){
+
+                photoButton.onclick=
+                    ()=>changeStudentPhoto(index);
+
+            }
 
 
             const accessCell=
