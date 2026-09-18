@@ -1408,6 +1408,87 @@
 
                 </div>
 
+                <!-- ==========================
+                     CLASS ROSTER
+                =========================== -->
+
+                <div class="settings-section roster-settings-section">
+
+                    <div class="settings-section-title">
+
+                        <div class="settings-section-icon">
+                            👩🏽‍🏫
+                        </div>
+
+                        <div>
+                            <h3>
+                                Class Roster
+                            </h3>
+
+                            <p>
+                                Add, edit, remove, or restore students.
+                            </p>
+                        </div>
+
+                    </div>
+
+                    <form
+                        id="addStudentForm"
+                        class="add-student-form">
+
+                        <div class="add-student-form-title">
+                            ➕ Add New Student
+                        </div>
+
+                        <input
+                            type="text"
+                            class="add-student-name"
+                            placeholder="Student name"
+                            required
+                        >
+
+                        <input
+                            type="number"
+                            class="add-student-points"
+                            min="0"
+                            step="1"
+                            value="0"
+                            placeholder="Starting points"
+                        >
+
+                        <div class="add-student-password-label">
+                            Choose 2 password pictures:
+                        </div>
+
+                        <div class="add-student-password-grid">
+                            <button type="button" class="add-student-password" data-icon="dog">🐶</button>
+                            <button type="button" class="add-student-password" data-icon="rocket">🚀</button>
+                            <button type="button" class="add-student-password" data-icon="rainbow">🌈</button>
+                            <button type="button" class="add-student-password" data-icon="dinosaur">🦖</button>
+                            <button type="button" class="add-student-password" data-icon="unicorn">🦄</button>
+                            <button type="button" class="add-student-password" data-icon="star">⭐</button>
+                            <button type="button" class="add-student-password" data-icon="butterfly">🦋</button>
+                            <button type="button" class="add-student-password" data-icon="car">🚗</button>
+                            <button type="button" class="add-student-password" data-icon="pizza">🍕</button>
+                            <button type="button" class="add-student-password" data-icon="cat">🐱</button>
+                            <button type="button" class="add-student-password" data-icon="heart">❤️</button>
+                        </div>
+
+                        <button
+                            type="submit"
+                            class="add-student-submit">
+                            ➕ Add Student
+                        </button>
+
+                    </form>
+
+                    <div
+                        id="teacherRosterList"
+                        class="teacher-roster-list">
+                    </div>
+
+                </div>
+
             </div>
 
         </div>
