@@ -1241,7 +1241,7 @@ async function clearSpecialPrice(name){
     saveLocal();
 
     return await firebaseDelete(
-        `storeSettings/specialPrices/${encodeURIComponent(name)}`
+        `storeSettings/specialPrices/${safeStoreSettingKey(name)}`
     );
 
 }
