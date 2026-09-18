@@ -3286,3 +3286,167 @@ button:active{
     left: auto !important;
     z-index: 22 !important;
 }
+
+/* =========================================
+   DOJO MART SETTINGS
+========================================= */
+
+.dojo-settings-manager{
+    width:100%;
+    box-sizing:border-box;
+}
+
+
+.settings-manager-header{
+    margin-bottom:20px;
+}
+
+
+.settings-manager-header h3{
+    margin:0 0 6px;
+    font-size:28px;
+    color:#5936a3;
+}
+
+
+.settings-manager-header p{
+    margin:0;
+    color:#666;
+    font-size:17px;
+}
+
+
+.teacher-pricing-list{
+    display:flex;
+    flex-direction:column;
+    gap:14px;
+}
+
+
+.teacher-price-card{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:20px;
+    padding:18px 20px;
+    background:white;
+    border:3px solid #eadcff;
+    border-radius:18px;
+    box-shadow:0 3px 10px rgba(89,54,163,.08);
+}
+
+
+.teacher-price-name{
+    display:flex;
+    flex-direction:column;
+    gap:6px;
+    min-width:0;
+}
+
+
+.teacher-price-name strong{
+    font-size:19px;
+    color:#49308c;
+}
+
+
+.teacher-price-name span{
+    font-size:14px;
+    color:#777;
+}
+
+
+.teacher-price-controls{
+    display:flex;
+    align-items:center;
+    gap:8px;
+    flex-shrink:0;
+}
+
+
+.teacher-price-input{
+    width:90px;
+    padding:10px;
+    border:2px solid #cdb5f5;
+    border-radius:10px;
+    font-family:inherit;
+    font-size:18px;
+    text-align:center;
+}
+
+
+.teacher-price-save,
+.teacher-availability-button{
+    border:0;
+    border-radius:11px;
+    padding:11px 15px;
+    font-family:inherit;
+    font-weight:700;
+    cursor:pointer;
+}
+
+
+.teacher-price-save{
+    background:#ffd447;
+    color:#493500;
+}
+
+
+.teacher-availability-button{
+    background:#f05a5a;
+    color:white;
+}
+
+
+.teacher-price-save:disabled,
+.teacher-availability-button:disabled{
+    opacity:.6;
+    cursor:wait;
+}
+
+
+.settings-status-in{
+    color:#239b56 !important;
+    font-weight:700;
+}
+
+
+.settings-status-out{
+    color:#e04444 !important;
+    font-weight:700;
+}
+
+
+.availability-header{
+    margin-top:35px;
+    padding-top:25px;
+    border-top:3px dashed #d9c1ff;
+}
+
+
+@media(max-width:700px){
+
+    .teacher-price-card{
+        flex-direction:column;
+        align-items:stretch;
+    }
+
+
+    .teacher-price-controls{
+        width:100%;
+        flex-wrap:wrap;
+    }
+
+
+    .teacher-price-input{
+        flex:1;
+        min-width:80px;
+    }
+
+
+    .teacher-price-save,
+    .teacher-availability-button{
+        flex:1;
+    }
+
+}
