@@ -3291,125 +3291,254 @@ button:active{
    DOJO MART SETTINGS
 ========================================= */
 
-.dojo-settings-manager{
+.teacher-settings-area{
     width:100%;
-    box-sizing:border-box;
+    padding:0;
 }
 
 
-.settings-manager-header{
-    margin-bottom:20px;
+/* =========================================
+   SETTINGS HEADER
+========================================= */
+
+.teacher-settings-header{
+    width:100%;
+    background:#8050df;
+    color:white;
+    padding:24px 28px;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
 }
 
-
-.settings-manager-header h3{
-    margin:0 0 6px;
-    font-size:28px;
-    color:#5936a3;
-}
-
-
-.settings-manager-header p{
+.teacher-settings-header h2{
     margin:0;
-    color:#666;
-    font-size:17px;
+    font-size:2rem;
+    color:white;
 }
 
+.teacher-settings-header p{
+    margin:7px 0 0;
+    color:#f4efff;
+    font-size:1rem;
+}
+
+
+/* =========================================
+   SETTINGS SECTION
+========================================= */
+
+.settings-section{
+    background:white;
+    margin:24px;
+    border:1px solid #e3d8f7;
+    border-radius:18px;
+    overflow:hidden;
+    box-shadow:
+        0 4px 12px rgba(89,54,163,.08);
+}
+
+.settings-section-title{
+    display:flex;
+    align-items:center;
+    gap:15px;
+    padding:20px 24px;
+    background:#f5f0ff;
+    border-bottom:2px solid #e3d8f7;
+}
+
+.settings-section-icon{
+    width:52px;
+    height:52px;
+    border-radius:14px;
+    background:#8050df;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-size:27px;
+    flex-shrink:0;
+}
+
+.settings-section-title h3{
+    margin:0;
+    color:#5936a3;
+    font-size:1.45rem;
+}
+
+.settings-section-title p{
+    margin:5px 0 0;
+    color:#666;
+    font-size:.95rem;
+}
+
+
+/* =========================================
+   SETTING ITEM LIST
+========================================= */
 
 .teacher-pricing-list{
     display:flex;
     flex-direction:column;
-    gap:14px;
+    width:100%;
 }
 
+
+/* =========================================
+   INDIVIDUAL SETTING ROW
+========================================= */
 
 .teacher-price-card{
-    display:flex;
+    width:100%;
+    min-height:78px;
+    display:grid;
+    grid-template-columns:
+        minmax(260px,1fr)
+        auto;
     align-items:center;
-    justify-content:space-between;
     gap:20px;
-    padding:18px 20px;
+    padding:14px 22px;
     background:white;
-    border:3px solid #eadcff;
-    border-radius:18px;
-    box-shadow:0 3px 10px rgba(89,54,163,.08);
+    border-bottom:1px solid #e9e4f1;
 }
 
+.teacher-price-card:last-child{
+    border-bottom:none;
+}
+
+.teacher-price-card:hover{
+    background:#faf8ff;
+}
+
+
+/* =========================================
+   ITEM NAME / STATUS
+========================================= */
 
 .teacher-price-name{
     display:flex;
     flex-direction:column;
-    gap:6px;
+    gap:4px;
     min-width:0;
 }
 
-
 .teacher-price-name strong{
-    font-size:19px;
-    color:#49308c;
+    color:#54319b;
+    font-size:1.05rem;
+    font-weight:700;
 }
-
 
 .teacher-price-name span{
-    font-size:14px;
     color:#777;
+    font-size:.85rem;
 }
 
+
+/* =========================================
+   PRICE CONTROLS
+========================================= */
 
 .teacher-price-controls{
     display:flex;
     align-items:center;
-    gap:8px;
-    flex-shrink:0;
+    justify-content:flex-end;
+    gap:10px;
 }
 
+.teacher-price-controls > span{
+    color:#f2b900;
+    font-size:1.25rem;
+}
 
 .teacher-price-input{
     width:90px;
-    padding:10px;
-    border:2px solid #cdb5f5;
+    height:46px;
+    border:2px solid #9d6bea;
     border-radius:10px;
-    font-family:inherit;
-    font-size:18px;
+    background:white;
+    color:#4a347f;
     text-align:center;
-}
-
-
-.teacher-price-save,
-.teacher-availability-button{
-    border:0;
-    border-radius:11px;
-    padding:11px 15px;
-    font-family:inherit;
+    font-family:'Fredoka',sans-serif;
+    font-size:18px;
     font-weight:700;
-    cursor:pointer;
+    padding:7px;
 }
 
+.teacher-price-input:focus{
+    outline:none;
+    border-color:#7b3ff2;
+    box-shadow:
+        0 0 0 3px rgba(123,63,242,.15);
+}
+
+
+/* =========================================
+   SAVE PRICE BUTTON
+========================================= */
 
 .teacher-price-save{
-    background:#ffd447;
-    color:#493500;
+    border:none;
+    border-radius:10px;
+    min-height:46px;
+    padding:9px 17px;
+    background:#ffd43b;
+    color:#503800;
+    font-family:'Fredoka',sans-serif;
+    font-weight:700;
+    cursor:pointer;
+    box-shadow:
+        0 3px 0 #dcae12;
 }
 
+.teacher-price-save:hover{
+    background:#ffdc5a;
+}
+
+.teacher-price-save:disabled{
+    opacity:.6;
+    cursor:wait;
+}
+
+
+/* =========================================
+   AVAILABILITY SECTION
+========================================= */
+
+.availability-settings-section{
+    margin-top:30px;
+}
 
 .teacher-availability-button{
-    background:#f05a5a;
+    border:none;
+    border-radius:10px;
+    min-height:46px;
+    padding:9px 17px;
+    background:#ef5350;
     color:white;
+    font-family:'Fredoka',sans-serif;
+    font-weight:700;
+    cursor:pointer;
+    box-shadow:
+        0 3px 0 #c93633;
 }
 
+.teacher-availability-button:hover{
+    background:#f56562;
+}
 
-.teacher-price-save:disabled,
 .teacher-availability-button:disabled{
     opacity:.6;
     cursor:wait;
 }
 
 
+/* =========================================
+   AVAILABILITY STATUS
+========================================= */
+
 .settings-status-in{
-    color:#239b56 !important;
+    color:#279144 !important;
     font-weight:700;
 }
-
 
 .settings-status-out{
     color:#e04444 !important;
@@ -3417,36 +3546,57 @@ button:active{
 }
 
 
-.availability-header{
-    margin-top:35px;
-    padding-top:25px;
-    border-top:3px dashed #d9c1ff;
-}
-
+/* =========================================
+   MOBILE SETTINGS
+========================================= */
 
 @media(max-width:700px){
 
-    .teacher-price-card{
-        flex-direction:column;
-        align-items:stretch;
+    .teacher-settings-header{
+        padding:20px;
     }
 
+    .teacher-settings-header h2{
+        font-size:1.55rem;
+    }
+
+    .settings-section{
+        margin:15px;
+        border-radius:15px;
+    }
+
+    .settings-section-title{
+        padding:17px;
+    }
+
+    .settings-section-title h3{
+        font-size:1.2rem;
+    }
+
+    .settings-section-title p{
+        font-size:.85rem;
+    }
+
+    .teacher-price-card{
+        grid-template-columns:1fr;
+        gap:12px;
+        padding:16px;
+    }
 
     .teacher-price-controls{
         width:100%;
+        justify-content:flex-start;
         flex-wrap:wrap;
     }
 
-
     .teacher-price-input{
-        flex:1;
-        min-width:80px;
+        width:85px;
     }
-
 
     .teacher-price-save,
     .teacher-availability-button{
         flex:1;
+        min-width:140px;
     }
 
 }
