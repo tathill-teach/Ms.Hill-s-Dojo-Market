@@ -890,6 +890,53 @@ async function saveStoreSettings(){
 }
 
 
+/* =========================================
+   TARGETED STORE SETTING SAVES
+   Save one setting at a time so changing
+   one treasure cannot block or overwrite
+   the other settings.
+========================================= */
+
+async function saveStorePrice(
+    name,
+    price
+){
+
+    saveLocal();
+
+    const safeName=
+        encodeURIComponent(
+            name
+        );
+
+    return await firebasePut(
+        `storeSettings/prices/${safeName}`,
+        Number(price)
+    );
+
+}
+
+
+async function saveStoreAvailability(
+    name,
+    outOfStock
+){
+
+    saveLocal();
+
+    const safeName=
+        encodeURIComponent(
+            name
+        );
+
+    return await firebasePut(
+        `storeSettings/outOfStock/${safeName}`,
+        Boolean(outOfStock)
+    );
+
+}
+
+
 function isManuallyOutOfStock(
     itemName
 ){
@@ -1042,7 +1089,10 @@ function renderTeacherSettings(){
 
 
                         const saved=
-                            await saveStoreSettings();
+                            await saveStorePrice(
+                                name,
+                                newPrice
+                            );
 
 
                         priceSave.disabled=
@@ -1188,7 +1238,10 @@ function renderTeacherSettings(){
 
 
                         const saved=
-                            await saveStoreSettings();
+                            await saveStoreAvailability(
+                                name,
+                                storeOutOfStock[name]
+                            );
 
 
                         if(saved){
