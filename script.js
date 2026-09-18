@@ -868,12 +868,30 @@ function renderStudentGrid(){
 }
 
 
+const defaultStudentPhotos=[
+
+    "assets/images/students/lucy hammer.png",
+    "assets/images/students/james selkirk.png",
+    "assets/images/students/jenna jonson.png",
+    "assets/images/students/owen alspach.png",
+    "assets/images/students/nicholas_luna.png",
+    "assets/images/students/guhan aroul.png",
+    "assets/images/student-placeholder.png",
+    "assets/images/students/ruby rodriguez.png",
+    "assets/images/students/zedek lobo.png",
+    "assets/images/students/eleanor pelletier.png",
+    "assets/images/students/eli hamilton.png",
+    "assets/images/students/eliana ayala.png",
+    "assets/images/student-placeholder.png",
+    "assets/images/students/elise arrieta.png",
+    "assets/images/students/casper kamali.png"
+
+];
+
 function getDefaultStudentPhoto(index){
 
-    const oldButton=studentButtons[index];
-    const oldImage=oldButton ? oldButton.querySelector("img") : null;
-
-    return oldImage ? oldImage.src : "assets/images/student-placeholder.png";
+    return defaultStudentPhotos[index] ||
+        "assets/images/student-placeholder.png";
 
 }
 
@@ -932,46 +950,84 @@ function compressStudentPhoto(file){
 
 }
 
-async function changeStudentPhoto(index){
+function changeStudentPhoto(index){
 
     const student=students[index];
     if(!student)return;
 
     const input=document.createElement("input");
+
     input.type="file";
     input.accept="image/*";
-    input.style.display="none";
+    input.setAttribute("capture","environment");
+
+    // Keep the file picker usable on phones/tablets while
+    // keeping the input itself invisible.
+    input.style.position="fixed";
+    input.style.left="-10000px";
+    input.style.top="0";
+    input.style.width="1px";
+    input.style.height="1px";
+    input.style.opacity="0";
+
     document.body.appendChild(input);
 
-    input.onchange=async()=>{
+    input.addEventListener("change",async()=>{
 
         const file=input.files?.[0];
-        if(!file){ input.remove(); return; }
+
+        if(!file){
+            input.remove();
+            return;
+        }
 
         try{
-            const oldPhoto=student.photo||"";
-            student.photo=await compressStudentPhoto(file);
 
-            const saved=await saveStudentRoster();
+            const oldPhoto=student.photo||"";
+
+            student.photo=
+                await compressStudentPhoto(file);
+
+            const saved=
+                await saveStudentRoster();
 
             if(!saved){
+
                 student.photo=oldPhoto;
-                alert("⚠️ The photo could not be saved. Please try again.");
+
+                alert(
+                    "⚠️ The photo could not be saved. Please try again."
+                );
+
                 input.remove();
                 return;
+
             }
 
+            // Immediately update both places:
+            // teacher Students tab + student selection screen.
             renderStudentGrid();
             renderTeacherTable();
 
         }catch(error){
-            console.error("Student photo error:",error);
-            alert("⚠️ The photo could not be added. Please try another image.");
+
+            console.error(
+                "Student photo error:",
+                error
+            );
+
+            alert(
+                "⚠️ The photo could not be added. Please try another image."
+            );
+
         }
 
         input.remove();
-    };
 
+    });
+
+    // This is called directly from the teacher's tap on the
+    // student's photo bubble so the device can open its picker.
     input.click();
 
 }
