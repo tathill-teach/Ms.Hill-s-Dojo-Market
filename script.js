@@ -2542,6 +2542,53 @@ async function refreshAll(){
             ...onlineOrders
         };
 
+        /*
+           Recover orders by the student's saved name too.
+           If an order reached Firebase under an unexpected
+           key, it will still appear beside the correct student.
+        */
+        Object.values(onlineOrders).forEach(
+            order=>{
+
+                if(
+                    !order||
+                    typeof order!=="object"||
+                    !order.studentName
+                ){
+
+                    return;
+
+                }
+
+                const matchingIndex=
+                    students.findIndex(
+                        student=>
+                            student.name===
+                            order.studentName
+                    );
+
+                if(
+                    matchingIndex!==-1
+                ){
+
+                    const current=
+                        studentOrders[matchingIndex];
+
+                    if(
+                        !current||
+                        !Array.isArray(current.items)
+                    ){
+
+                        studentOrders[matchingIndex]=
+                            order;
+
+                    }
+
+                }
+
+            }
+        );
+
 
         Object.keys(localOrders).forEach(
             async index=>{
@@ -3903,8 +3950,22 @@ function renderTeacherTable(){
 
             }
 
-            const order=
+            let order=
                 studentOrders[index];
+
+            if(!order){
+
+                order=
+                    Object.values(
+                        studentOrders||{}
+                    ).find(
+                        candidate=>
+                            candidate&&
+                            candidate.studentName===
+                            student.name
+                    );
+
+            }
 
 
             const row=
