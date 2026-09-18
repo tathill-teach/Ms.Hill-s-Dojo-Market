@@ -1121,6 +1121,21 @@ async function saveStoreSettings(){
    the other settings.
 ========================================= */
 
+function safeStoreSettingKey(name){
+
+    return String(name)
+        .replace(/\./g,"_DOT_")
+        .replace(/#/g,"_HASH_")
+        .replace(/\$/g,"_DOLLAR_")
+        .replace(/\[/g,"_LBRACKET_")
+        .replace(/\]/g,"_RBRACKET_")
+        .replace(/\//g,"_SLASH_");
+
+}
+
+
+
+
 async function saveStorePrice(
     name,
     price
@@ -1129,7 +1144,7 @@ async function saveStorePrice(
     saveLocal();
 
     const safeName=
-        encodeURIComponent(
+        safeStoreSettingKey(
             name
         );
 
@@ -1213,7 +1228,7 @@ async function saveSpecialPrice(name,price){
     saveLocal();
 
     return await firebasePut(
-        `storeSettings/specialPrices/${encodeURIComponent(name)}`,
+        `storeSettings/specialPrices/${safeStoreSettingKey(name)}`,
         record
     );
 
