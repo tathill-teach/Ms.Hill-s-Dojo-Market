@@ -2533,80 +2533,136 @@ async function refreshAll(){
     ){
 
         /*
-           Keep any order that was saved locally but
-           never made it into Firebase. Firebase orders
-           still take priority when both copies exist.
+           Merge local and Firebase orders carefully.
+
+           IMPORTANT:
+           A student can finish checkout and have the full
+           receipt saved in localStorage while Firebase has
+           an older/incomplete copy of that order. If the
+           Firebase copy has no items, NEVER let it overwrite
+           a local copy that still contains the purchased
+           items. Restore the complete local order online.
         */
-        studentOrders={
-            ...localOrders,
-            ...onlineOrders
-        };
+        studentOrders={};
 
-        /*
-           Recover orders by the student's saved name too.
-           If an order reached Firebase under an unexpected
-           key, it will still appear beside the correct student.
-        */
-        Object.values(onlineOrders).forEach(
-            order=>{
+        for(
+            const [rawIndex,onlineOrder]
+            of Object.entries(onlineOrders)
+        ){
 
-                if(
-                    !order||
-                    typeof order!=="object"||
-                    !order.studentName
-                ){
+            const numericIndex=Number(rawIndex);
 
-                    return;
+            let matchingIndex=
+                Number.isInteger(numericIndex) &&
+                students[numericIndex]
+                    ? numericIndex
+                    : -1;
 
-                }
+            /*
+               Also recover an order that was saved under an
+               unexpected key by matching the student's name.
+            */
+            if(
+                matchingIndex===-1 &&
+                onlineOrder&&
+                typeof onlineOrder==="object"&&
+                onlineOrder.studentName
+            ){
 
-                const matchingIndex=
+                matchingIndex=
                     students.findIndex(
                         student=>
                             student.name===
-                            order.studentName
+                            onlineOrder.studentName
                     );
 
-                if(
+            }
+
+            const localOrder=
+                matchingIndex!==-1
+                    ? localOrders[matchingIndex]
+                    : localOrders[rawIndex];
+
+            const onlineHasItems=
+                onlineOrder&&
+                Array.isArray(
+                    onlineOrder.items
+                )&&
+                onlineOrder.items.length>0;
+
+            const localHasItems=
+                localOrder&&
+                Array.isArray(
+                    localOrder.items
+                )&&
+                localOrder.items.length>0;
+
+            if(
+                localHasItems &&
+                !onlineHasItems
+            ){
+
+                /*
+                   Firebase has the broken/incomplete copy.
+                   Keep the complete student receipt and repair
+                   Firebase so the teacher can see the items.
+                */
+                const targetIndex=
                     matchingIndex!==-1
-                ){
+                        ? matchingIndex
+                        : Number(rawIndex);
 
-                    const current=
-                        studentOrders[matchingIndex];
+                studentOrders[targetIndex]=
+                    localOrder;
 
-                    if(
-                        !current||
-                        !Array.isArray(current.items)
-                    ){
+                await saveOrderOnline(
+                    targetIndex,
+                    localOrder
+                );
 
-                        studentOrders[matchingIndex]=
-                            order;
+            }else if(
+                matchingIndex!==-1
+            ){
 
-                    }
+                studentOrders[matchingIndex]=
+                    onlineOrder;
 
-                }
+            }else{
 
-            }
-        );
-
-
-        Object.keys(localOrders).forEach(
-            async index=>{
-
-                if(
-                    onlineOrders[index]===undefined&&
-                    localOrders[index]
-                ){
-
-                    await saveOrderOnline(
-                        Number(index),
-                        localOrders[index]
-                    );
-
-                }
+                studentOrders[rawIndex]=
+                    onlineOrder;
 
             }
-        );
+
+        }
+
+        /*
+           If an order only exists locally, send it to Firebase.
+        */
+        for(
+            const [rawIndex,localOrder]
+            of Object.entries(localOrders)
+        ){
+
+            if(
+                onlineOrders[rawIndex]===undefined &&
+                localOrder
+            ){
+
+                const index=
+                    Number(rawIndex);
+
+                studentOrders[index]=
+                    localOrder;
+
+                await saveOrderOnline(
+                    index,
+                    localOrder
+                );
+
+            }
+
+        }
 
     }else{
 
@@ -4108,10 +4164,12 @@ function renderTeacherTable(){
                 );
 
 
-            if(
-                order?.status===
-                "processing"
-            ){
+            /*
+               Orders stay viewable after completion too.
+               The teacher should always be able to open the
+               receipt/order details for any saved order.
+            */
+            if(order){
 
                 const orderButton=
                     document.createElement(
@@ -4123,7 +4181,8 @@ function renderTeacherTable(){
                     "teacher-order-button";
 
 
-                orderButton.textContent = `View Order (${Array.isArray(order.items) ? order.items.length : 0})`;
+                orderButton.textContent =
+                    `View Order (${Array.isArray(order.items) ? order.items.length : 0})`;
 
                 orderButton.onclick=
                     ()=>{
@@ -4146,11 +4205,7 @@ function renderTeacherTable(){
                         teacher-no-order
                     ">
 
-                        ${
-                            order
-                                ? "Completed"
-                                : "No Order"
-                        }
+                        No Order
 
                     </span>
 
