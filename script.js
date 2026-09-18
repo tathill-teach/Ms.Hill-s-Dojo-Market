@@ -2514,16 +2514,57 @@ async function refreshAll(){
     }
 
 
+    const localOrders=
+        studentOrders&&
+        typeof studentOrders==="object"
+            ? {...studentOrders}
+            : {};
+
+
     const onlineOrders=
         await firebaseGet(
             "orders"
         );
 
 
-    if(onlineOrders){
+    if(
+        onlineOrders&&
+        typeof onlineOrders==="object"
+    ){
+
+        /*
+           Keep any order that was saved locally but
+           never made it into Firebase. Firebase orders
+           still take priority when both copies exist.
+        */
+        studentOrders={
+            ...localOrders,
+            ...onlineOrders
+        };
+
+
+        Object.keys(localOrders).forEach(
+            async index=>{
+
+                if(
+                    onlineOrders[index]===undefined&&
+                    localOrders[index]
+                ){
+
+                    await saveOrderOnline(
+                        Number(index),
+                        localOrders[index]
+                    );
+
+                }
+
+            }
+        );
+
+    }else{
 
         studentOrders=
-            onlineOrders;
+            localOrders;
 
     }
 
