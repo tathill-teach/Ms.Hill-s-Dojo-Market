@@ -1054,7 +1054,9 @@ async function loadStoreSettings(){
             ){
 
                 storePrices=
-                    onlineSettings.prices;
+                    decodeStoreSettingMap(
+                        onlineSettings.prices
+                    );
 
             }
 
@@ -1065,7 +1067,9 @@ async function loadStoreSettings(){
             ){
 
                 storeOutOfStock=
-                    onlineSettings.outOfStock;
+                    decodeStoreSettingMap(
+                        onlineSettings.outOfStock
+                    );
 
             }
 
@@ -1075,7 +1079,9 @@ async function loadStoreSettings(){
             ){
 
                 storeSpecialPrices=
-                    onlineSettings.specialPrices;
+                    decodeStoreSettingMap(
+                        onlineSettings.specialPrices
+                    );
 
             }
 
@@ -1123,13 +1129,119 @@ async function saveStoreSettings(){
 
 function safeStoreSettingKey(name){
 
-    return String(name)
-        .replace(/\./g,"_DOT_")
-        .replace(/#/g,"_HASH_")
-        .replace(/\$/g,"_DOLLAR_")
-        .replace(/\[/g,"_LBRACKET_")
-        .replace(/\]/g,"_RBRACKET_")
-        .replace(/\//g,"_SLASH_");
+    /*
+       Firebase keys cannot contain:
+       . # $ [ ] /
+       Encode the entire name so every treasure
+       name is always a valid Firebase key.
+    */
+    return encodeURIComponent(
+        String(name)
+    ).replace(/\./g,"%2E");
+
+}
+
+
+function decodeStoreSettingKey(key){
+
+    try{
+
+        return decodeURIComponent(
+            String(key)
+        );
+
+    }catch(error){
+
+        return String(key);
+
+    }
+
+}
+
+
+function serializeStoreSettingMap(map){
+
+    const output={};
+
+    Object.entries(
+        map||{}
+    ).forEach(
+        ([name,value])=>{
+
+            output[
+                safeStoreSettingKey(name)
+            ]=value;
+
+        }
+    );
+
+    return output;
+
+}
+
+
+function decodeStoreSettingMap(map){
+
+    const output={};
+
+    if(
+        !map||
+        typeof map!=="object"
+    ){
+
+        return output;
+
+    }
+
+    Object.entries(map).forEach(
+        ([key,value])=>{
+
+            let name=
+                decodeStoreSettingKey(key);
+
+            /*
+               Support the older temporary key format
+               created by the first version of this fix.
+            */
+            name=
+                name
+                    .replace(/_DOT_/g,".")
+                    .replace(/_HASH_/g,"#")
+                    .replace(/_DOLLAR_/g,"$")
+                    .replace(/_LBRACKET_/g,"[")
+                    .replace(/_RBRACKET_/g,"]")
+                    .replace(/_SLASH_/g,"/");
+
+            output[name]=value;
+
+        }
+    );
+
+    return output;
+
+}
+
+
+function buildStoreSettingsPayload(){
+
+    return {
+
+        prices:
+            serializeStoreSettingMap(
+                storePrices
+            ),
+
+        outOfStock:
+            serializeStoreSettingMap(
+                storeOutOfStock
+            ),
+
+        specialPrices:
+            serializeStoreSettingMap(
+                storeSpecialPrices
+            )
+
+    };
 
 }
 
@@ -1141,16 +1253,14 @@ async function saveStorePrice(
     price
 ){
 
+    storePrices[name]=
+        Number(price);
+
     saveLocal();
 
-    const safeName=
-        safeStoreSettingKey(
-            name
-        );
-
     return await firebasePut(
-        `storeSettings/prices/${safeName}`,
-        Number(price)
+        "storeSettings",
+        buildStoreSettingsPayload()
     );
 
 }
@@ -1228,8 +1338,8 @@ async function saveSpecialPrice(name,price){
     saveLocal();
 
     return await firebasePut(
-        `storeSettings/specialPrices/${safeStoreSettingKey(name)}`,
-        record
+        "storeSettings",
+        buildStoreSettingsPayload()
     );
 
 }
@@ -1240,8 +1350,9 @@ async function clearSpecialPrice(name){
     delete storeSpecialPrices[name];
     saveLocal();
 
-    return await firebaseDelete(
-        `storeSettings/specialPrices/${safeStoreSettingKey(name)}`
+    return await firebasePut(
+        "storeSettings",
+        buildStoreSettingsPayload()
     );
 
 }
