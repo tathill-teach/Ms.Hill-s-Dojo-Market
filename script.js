@@ -166,6 +166,7 @@ let selectedPasswordIcons=[];
 let cartItems=[];
 
 let inventory={};
+let inventoryCatalog={};
 
 let storePrices={};
 
@@ -1542,6 +1543,9 @@ function isManuallyOutOfStock(
    TEACHER SETTINGS
 ========================================= */
 
+
+async function saveAllStudentChanges(){const button=$("saveAllStudents"),status=$("studentSaveStatus");if(!button)return;const previous=students.map(s=>({...s,password:[...(s.password||[])]}));const pointInputs=[...qa("#teacherStudentTableBody .teacher-points-input")];for(const input of pointInputs){const value=Number(input.value);if(!Number.isInteger(value)||value<0){alert("Enter whole-number points of 0 or greater.");input.focus();return;}const index=Number(input.closest("tr")?.dataset.studentIndex);if(Number.isInteger(index)&&students[index])students[index].points=value;}for(const row of [...qa("#teacherRosterList .teacher-roster-row")]){const index=Number(row.dataset.studentIndex),nameInput=row.querySelector(".teacher-roster-name"),pointsInput=row.querySelector(".teacher-roster-points");if(!Number.isInteger(index)||!students[index])continue;if(!nameInput.value.trim()){alert("Every student must have a name.");nameInput.focus();return;}const tablePoint=pointInputs.find(input=>Number(input.closest("tr")?.dataset.studentIndex)===index);students[index].name=nameInput.value.trim();if(tablePoint)pointsInput.value=tablePoint.value;const value=Number(pointsInput.value);if(!Number.isInteger(value)||value<0){alert("Enter whole-number points of 0 or greater.");pointsInput.focus();return;}students[index].points=value;}button.disabled=true;button.textContent="⏳ Saving...";if(status)status.textContent="";saveLocal();const rosterSaved=await saveStudentRoster();const pointResults=await Promise.all(students.map((student,index)=>savePoints(index)));button.disabled=false;button.textContent="💾 Save All Student Changes";if(rosterSaved&&pointResults.every(Boolean)){renderStudentGrid();renderTeacherTable();renderTeacherRoster();if(status)status.textContent="✅ All student changes saved";}else{students=previous;saveLocal();renderStudentGrid();renderTeacherTable();renderTeacherRoster();if(status)status.textContent="⚠️ Save failed";alert("Some student changes could not be saved to Firebase. Previous values were restored.");}}
+
 function renderTeacherRoster(){
 
     const list=$("teacherRosterList");
@@ -1555,6 +1559,7 @@ function renderTeacherRoster(){
 
         const row=document.createElement("div");
         row.className="teacher-roster-row";
+        row.dataset.studentIndex=index;
 
         const fields=document.createElement("div");
         fields.className="teacher-roster-fields";
@@ -1583,47 +1588,7 @@ function renderTeacherRoster(){
         const actions=document.createElement("div");
         actions.className="teacher-roster-actions";
 
-        const save=document.createElement("button");
-        save.type="button";
-        save.className="teacher-roster-save";
-        save.textContent="💾 Save";
-
-        save.onclick=async()=>{
-
-            const name=nameInput.value.trim();
-            if(!name){alert("Please enter a student name.");return;}
-
-            const saved=await editStudentFromTeacher(
-                index,
-                name,
-                student.password,
-                Number(pointsInput.value)||0
-            );
-
-            if(saved)renderTeacherRoster();
-            else alert("⚠️ Student could not be saved.");
-
-        };
-
-        const toggle=document.createElement("button");
-        toggle.type="button";
-        toggle.className="teacher-roster-remove";
-        toggle.textContent=student.active===false?"↩️ Restore":"🗑️ Remove";
-
-        toggle.onclick=async()=>{
-
-            if(student.active!==false){
-                if(!confirm("Remove "+student.name+" from the class list?"))return;
-            }
-
-            const saved=await toggleStudentActive(index);
-
-            if(saved)renderTeacherRoster();
-            else alert("⚠️ Student roster could not be updated.");
-
-        };
-
-        actions.append(save,toggle);
+        const toggle=document.createElement("button");toggle.type="button";toggle.className="teacher-roster-remove";toggle.textContent=student.active===false?"↩️ Restore":"🗑️ Remove";toggle.onclick=async()=>{if(student.active!==false&&!confirm("Remove "+student.name+" from the class list?"))return;const saved=await toggleStudentActive(index);if(saved)renderTeacherRoster();else alert("⚠️ Student roster could not be updated.");};actions.append(toggle);
         row.append(fields,actions);
         list.appendChild(row);
 
@@ -2177,90 +2142,24 @@ function updateShopPrices(){
 
 }
 
+
+/* INVENTORY CATALOG: image customization and expiration */
+function isCatalogItemExpired(record){return !!(record&&record.permanent===false&&record.expiresAt&&record.expiresAt<new Date().toISOString().slice(0,10));}
+async function saveInventoryCatalog(){const payload={};let i=0;Object.entries(inventoryCatalog).forEach(([name,record])=>{payload["item_"+(i++)]={...record,name};});return await firebasePut("inventoryCatalog",payload);}
+function decodeInventoryCatalog(data){const output={};if(!data||typeof data!=="object")return output;Object.values(data).forEach(record=>{if(record&&typeof record==="object"&&typeof record.name==="string")output[record.name]={image:record.image||"",permanent:record.permanent!==false,expiresAt:record.expiresAt||"",category:record.category||"✨ New Treasures",createdAt:record.createdAt||"",price:Number(record.price)||0};});return output;}
+async function loadInventoryCatalog(){const online=await firebaseGet("inventoryCatalog");if(online&&typeof online==="object")inventoryCatalog=decodeInventoryCatalog(online);expireTemporaryInventoryItems(false);applyInventoryCatalogImages();renderDynamicInventoryCards();}
+function expireTemporaryInventoryItems(save=true){let changed=false;Object.entries(inventoryCatalog).forEach(([name,record])=>{if(isCatalogItemExpired(record)){delete inventoryCatalog[name];delete inventory[name];delete storePrices[name];changed=true;}});if(changed){saveLocal();if(save){saveInventoryCatalog();saveInventory();saveStoreSettings();}}return changed;}
+function compressInventoryImage(file){return new Promise((resolve,reject)=>{if(!file){resolve("");return;}if(!file.type.startsWith("image/")){reject(new Error("Choose an image file."));return;}const reader=new FileReader();reader.onload=()=>{const img=new Image();img.onload=()=>{const scale=Math.min(1,600/Math.max(img.width,img.height));const canvas=document.createElement("canvas");canvas.width=Math.max(1,Math.round(img.width*scale));canvas.height=Math.max(1,Math.round(img.height*scale));canvas.getContext("2d").drawImage(img,0,0,canvas.width,canvas.height);resolve(canvas.toDataURL("image/jpeg",0.76));};img.onerror=()=>reject(new Error("The selected image could not be opened."));img.src=reader.result;};reader.onerror=()=>reject(new Error("The selected image could not be read."));reader.readAsDataURL(file);});}
+function setRewardCardImage(card,image){if(!card||!image)return;const wrapper=card.querySelector(".reward-image");if(!wrapper)return;wrapper.innerHTML="";const img=document.createElement("img");img.src=image;img.alt=card.querySelector("h3")?.textContent.trim()||"Treasure";img.loading="lazy";wrapper.appendChild(img);}
+function applyInventoryCatalogImages(){qa(".reward-card").forEach(card=>{const name=card.querySelector("h3")?.textContent.trim();if(name&&inventoryCatalog[name]?.image)setRewardCardImage(card,inventoryCatalog[name].image);});}
+function renderDynamicInventoryCards(){if(!shopScreen)return;let host=$("dynamicInventoryItems");if(!host){host=document.createElement("div");host.id="dynamicInventoryItems";host.className="dynamic-inventory-items";const title=document.createElement("h3");title.className="shop-category";title.textContent="✨ New Treasures";host.appendChild(title);const grid=document.createElement("div");grid.className="shop-grid";grid.id="dynamicInventoryGrid";host.appendChild(grid);if(cartButton&&cartButton.parentNode)shopScreen.insertBefore(host,cartButton);else shopScreen.appendChild(host);}const grid=$("dynamicInventoryGrid");if(!grid)return;grid.innerHTML="";Object.entries(inventoryCatalog).forEach(([name,record])=>{const existing=[...qa(".reward-card")].some(card=>!card.dataset.catalogName&&card.querySelector("h3")?.textContent.trim()===name);if(record.isBuiltIn||existing||isCatalogItemExpired(record))return;const card=document.createElement("div");card.className="reward-card";card.dataset.catalogName=name;const image=document.createElement("div");image.className="reward-image";if(record.image){const img=document.createElement("img");img.src=record.image;img.alt=name;img.loading="lazy";image.appendChild(img);}else image.textContent="🎁";const title=document.createElement("h3");title.textContent=name;const price=document.createElement("p");price.textContent="⭐ "+(Number(storePrices[name])||Number(record.price)||0)+" Dojo Points";const button=document.createElement("button");button.className="buy-btn";button.textContent="Choose";card.append(image,title,price,button);grid.appendChild(card);});host.style.display=grid.children.length?"block":"none";}
+function openInventoryEditor(name){const record=inventoryCatalog[name]||{image:"",permanent:true,expiresAt:"",category:"✨ New Treasures",price:storePrices[name]};const overlay=document.createElement("div");overlay.className="inventory-editor-modal";overlay.id="inventoryEditorModal";const card=document.createElement("div");card.className="inventory-editor-card";card.innerHTML='<h3>🖼️ Edit Treasure</h3><form class="inventory-editor-form"><label>Treasure name<input name="name" required></label><label>Dojo Points price<input name="price" type="number" min="0" step="1" required></label><label class="inventory-wide">Replace image (leave empty to keep current)<input name="image" type="file" accept="image/*"></label><label>Item duration<select name="duration"><option value="permanent">Permanent</option><option value="temporary">Temporary</option></select></label><label class="expiry-field">Expiration date<input name="expiresAt" type="date"></label><div class="inventory-editor-actions inventory-wide"><button class="inventory-editor-save" type="submit">💾 Save Item</button><button class="inventory-editor-cancel" type="button">Cancel</button></div></form>';overlay.appendChild(card);document.body.appendChild(overlay);const form=card.querySelector("form");form.elements.name.value=name;form.elements.price.value=Number(storePrices[name]??record.price??0);form.elements.duration.value=record.permanent===false?"temporary":"permanent";form.elements.expiresAt.value=record.expiresAt||"";const expiry=form.querySelector(".expiry-field");const toggleExpiry=()=>{expiry.style.display=form.elements.duration.value==="temporary"?"flex":"none";form.elements.expiresAt.required=form.elements.duration.value==="temporary";};form.elements.duration.addEventListener("change",toggleExpiry);toggleExpiry();card.querySelector(".inventory-editor-cancel").onclick=()=>overlay.remove();form.addEventListener("submit",async event=>{event.preventDefault();const nextName=form.elements.name.value.trim(),price=Math.floor(Number(form.elements.price.value)),duration=form.elements.duration.value,expiresAt=form.elements.expiresAt.value;if(!nextName||!Number.isInteger(price)||price<0){alert("Enter a treasure name and valid price.");return;}if(duration==="temporary"&&(!expiresAt||expiresAt<new Date().toISOString().slice(0,10))){alert("Choose an expiration date today or later.");return;}let image=record.image||"";try{if(form.elements.image.files[0])image=await compressInventoryImage(form.elements.image.files[0]);}catch(error){alert(error.message);return;}const oldQty=inventory[name]??10;if(nextName!==name){delete inventory[name];inventory[nextName]=oldQty;delete storePrices[name];}storePrices[nextName]=price;inventoryCatalog[nextName]={image,price,permanent:duration==="permanent",expiresAt:duration==="temporary"?expiresAt:"",category:record.category||"✨ New Treasures",createdAt:record.createdAt||new Date().toISOString()};if(isCatalogItemExpired(inventoryCatalog[nextName])){delete inventoryCatalog[nextName];delete inventory[nextName];}const results=await Promise.all([saveInventoryCatalog(),saveInventory(),saveStoreSettings()]);if(results.every(Boolean)){overlay.remove();renderDynamicInventoryCards();applyInventoryCatalogImages();renderInventory();renderTeacherSettings();updateShopPrices();alert("Treasure saved!");}else alert("At least one Firebase save failed. Please try again.");});}
+
 /* =========================================
    STORE ITEM LIST
 ========================================= */
 
-function getStoreItems(){
-
-    const items={};
-
-    qa(".reward-card")
-        .forEach(
-            card=>{
-
-                const title=
-                    card.querySelector(
-                        "h3"
-                    );
-
-                const priceText=
-                    card.querySelector(
-                        "p"
-                    );
-
-                if(
-                    !title||
-                    !priceText
-                ){
-
-                    return;
-
-                }
-
-                const name=
-                    title.textContent.trim();
-
-                const match=
-                    priceText.textContent.match(
-                        /\d+/
-                    );
-
-                if(!match){
-
-                    return;
-
-                }
-
-                const savedPrice=
-    Number(
-        storePrices[name]
-    );
-
-
-const regularPrice=
-    Number.isFinite(
-        savedPrice
-    )
-        ? savedPrice
-        : Number(match[0]);
-
-const price=
-    getEffectivePrice(
-        name,
-        regularPrice
-    );
-
-
-priceText.textContent=
-    `⭐ ${price} Dojo Points`;
-
-
-items[name]={
-
-    name:name,
-
-    price:price
-
-};
-
-            }
-        );
-
-    return items;
-
-}
-
+function getStoreItems(){const items={};qa(".reward-card").forEach(card=>{const title=card.querySelector("h3"),priceText=card.querySelector("p");if(!title||!priceText)return;const name=title.textContent.trim();if(!name||isCatalogItemExpired(inventoryCatalog[name]))return;const match=priceText.textContent.match(/\d+/),savedPrice=Number(storePrices[name]);const regularPrice=Number.isFinite(savedPrice)?savedPrice:(match?Number(match[0]):Number(inventoryCatalog[name]?.price)||0);const price=getEffectivePrice(name,regularPrice);priceText.textContent="⭐ "+price+" Dojo Points";items[name]={name,price};});return items;}
 
 /* =========================================
    DIVE TOY CHECK
@@ -4149,6 +4048,7 @@ function renderTeacherTable(){
                 document.createElement(
                     "tr"
                 );
+            row.dataset.studentIndex=index;
 
 
             const isOpen=
@@ -4425,104 +4325,7 @@ function renderTeacherTable(){
             );
 
 
-            const updateCell=
-                document.createElement(
-                    "td"
-                );
-
-
-            const saveButton=
-                document.createElement(
-                    "button"
-                );
-
-
-            saveButton.className=
-                "teacher-update-points";
-
-
-            saveButton.textContent=
-                "💾 Save";
-
-
-            saveButton.onclick=
-                async()=>{
-
-                    const newPoints=
-                        Math.floor(
-                            Number(
-                                pointsInput.value
-                            )
-                        );
-
-
-                    if(
-                        !Number.isFinite(
-                            newPoints
-                        )||
-                        newPoints<0
-                    ){
-
-                        alert(
-                            "Enter a valid whole number."
-                        );
-
-                        return;
-
-                    }
-
-
-                    const oldPoints=
-                        student.points;
-
-
-                    student.points=
-                        newPoints;
-
-
-                    saveButton.disabled=
-                        true;
-
-
-                    const saved=
-                        await savePoints(
-                            index
-                        );
-
-
-                    if(!saved){
-
-                        student.points=
-                            oldPoints;
-
-                        saveButton.disabled=
-                            false;
-
-                        alert(
-                            "⚠️ Points could not be saved online."
-                        );
-
-                        return;
-
-                    }
-
-
-                    saveLocal();
-
-
-                    renderTeacherTable();
-
-                };
-
-
-            updateCell.appendChild(
-                saveButton
-            );
-
-
-            row.appendChild(
-                updateCell
-            );
+            const updateCell=document.createElement("td");updateCell.textContent="Use Save All Students above.";updateCell.className="teacher-bulk-note";row.appendChild(updateCell);
 
 
             teacherStudentTableBody.appendChild(
@@ -5039,400 +4842,23 @@ async function completeOrder(
 ========================================= */
 
 function renderInventory(){
-
-    let table=
-        $("teacherInventoryTable");
-
-    if(!table){
-
-        if(!teacherDashboard)return;
-
-        const shell=
-            document.createElement(
-                "section"
-            );
-
-        shell.className=
-            "teacher-inventory-manager";
-
-        shell.innerHTML=
-            `
-            <div class="teacher-inventory-header">
-
-                <div>
-
-                    <h2>
-                        📦 Treasure Inventory
-                    </h2>
-
-                    <p>
-                        Update the quantity for each
-                        treasure. All treasures start at
-                        <strong>10</strong> except
-                        <strong>Pokémon Dive Toys</strong>,
-                        which starts at <strong>0</strong>.
-                    </p>
-
-                </div>
-
-                <button
-                    id="refreshInventory"
-                    type="button"
-                    class="refresh-inventory-button">
-
-                    🔄 Refresh Inventory
-
-                </button>
-
-            </div>
-
-
-            <div class="teacher-inventory-sheet-wrap">
-
-                <table
-                    id="teacherInventoryTable"
-                    class="teacher-inventory-sheet">
-
-                    <thead>
-
-                        <tr>
-
-                            <th>
-                                Treasure
-                            </th>
-
-                            <th>
-                                Price
-                            </th>
-
-                            <th>
-                                Quantity
-                            </th>
-
-                            <th>
-                                Status
-                            </th>
-
-                            <th>
-                                Update
-                            </th>
-
-                        </tr>
-
-                    </thead>
-
-
-                    <tbody
-                        id="teacherInventoryTableBody">
-                    </tbody>
-
-                </table>
-
-            </div>
-            `;
-
-
-        if(teacherInventoryContainer){
-
-    teacherInventoryContainer.appendChild(
-        shell
-    );
-
-}else{
-
-    teacherDashboard.appendChild(
-        shell
-    );
-
+if(!teacherInventoryContainer)return;let shell=$("teacherInventoryManager");
+if(!shell){shell=document.createElement("section");shell.id="teacherInventoryManager";shell.className="teacher-inventory-manager";
+shell.innerHTML='<div class="teacher-inventory-header"><div><h2>📦 Treasure Inventory</h2><p>Edit quantities, add treasures, and update pictures. Changes save together.</p></div><button id="refreshInventory" type="button" class="refresh-inventory-button">🔄 Refresh Inventory</button></div><section class="inventory-create-section"><h3>➕ Add a Treasure</h3><p>Choose permanent or temporary. Temporary items disappear from the store and inventory after their expiration date.</p><form id="inventoryCreateForm" class="inventory-create-form"><label>Treasure name<input name="name" required maxlength="70" placeholder="e.g. Mini slime"></label><label>Dojo Points price<input name="price" type="number" min="0" step="1" value="25" required></label><label>Starting quantity<input name="quantity" type="number" min="0" step="1" value="10" required></label><label>Item duration<select name="duration"><option value="permanent">Permanent</option><option value="temporary">Temporary</option></select></label><label class="expiry-create-field">Expiration date<input name="expiresAt" type="date"></label><label>Treasure picture<input name="image" type="file" accept="image/*"><span class="inventory-image-help">Optional. Images are resized before saving.</span></label><button class="inventory-submit inventory-wide" type="submit">➕ Add to Inventory</button></form></section><div class="teacher-bulk-actions"><p>Update any quantities below, then save them all at once.</p><button id="saveAllInventory" type="button" class="teacher-save-all">💾 Save All Inventory</button><span id="inventorySaveStatus" role="status" aria-live="polite"></span></div><div class="teacher-inventory-sheet-wrap"><table id="teacherInventoryTable" class="teacher-inventory-sheet"><thead><tr><th>Treasure</th><th>Price</th><th>Quantity</th><th>Status</th><th>Type / Expiration</th><th>Image / Edit</th></tr></thead><tbody id="teacherInventoryTableBody"></tbody></table></div>';
+teacherInventoryContainer.appendChild(shell);$("refreshInventory").onclick=async()=>{await loadInventory();await loadInventoryCatalog();renderInventory();};
+const form=$("inventoryCreateForm"),duration=form.elements.duration,expiry=form.querySelector(".expiry-create-field");const toggleExpiry=()=>{expiry.style.display=duration.value==="temporary"?"flex":"none";form.elements.expiresAt.required=duration.value==="temporary";};duration.addEventListener("change",toggleExpiry);toggleExpiry();
+form.addEventListener("submit",async event=>{event.preventDefault();const name=form.elements.name.value.trim(),price=Math.floor(Number(form.elements.price.value)),quantity=Math.floor(Number(form.elements.quantity.value)),kind=duration.value,expiresAt=form.elements.expiresAt.value;if(!name||!Number.isInteger(price)||price<0||!Number.isInteger(quantity)||quantity<0){alert("Enter a name, price, and whole-number quantity of 0 or greater.");return;}if(getStoreItems()[name]||inventoryCatalog[name]){alert("A treasure with that name already exists. Use Edit instead.");return;}if(kind==="temporary"&&(!expiresAt||expiresAt<new Date().toISOString().slice(0,10))){alert("Choose an expiration date today or later.");return;}let image="";try{if(form.elements.image.files[0])image=await compressInventoryImage(form.elements.image.files[0]);}catch(error){alert(error.message);return;}inventoryCatalog[name]={image,price,permanent:kind==="permanent",expiresAt:kind==="temporary"?expiresAt:"",category:"✨ New Treasures",createdAt:new Date().toISOString()};inventory[name]=quantity;storePrices[name]=price;const results=await Promise.all([saveInventoryCatalog(),saveInventory(),saveStoreSettings()]);if(results.every(Boolean)){form.reset();form.elements.price.value=25;form.elements.quantity.value=10;toggleExpiry();renderDynamicInventoryCards();renderInventory();updateShopPrices();alert("Treasure added to Dojo Mart!");}else alert("At least one Firebase save failed. Please try again.");});
+$("saveAllInventory").onclick=saveAllInventoryChanges;}
+expireTemporaryInventoryItems();ensureInventory();const body=$("teacherInventoryTableBody");if(!body)return;body.innerHTML="";
+Object.entries(getStoreItems()).forEach(([name,item])=>{const record=inventoryCatalog[name]||{permanent:true};const row=document.createElement("tr");if(qty(name)===0)row.classList.add("inventory-empty-row");
+const nameCell=document.createElement("td"),editWrap=document.createElement("div");editWrap.className="inventory-item-edit";const preview=document.createElement("img");preview.className="inventory-item-preview";preview.alt=name;const source=[...qa(".reward-card")].find(card=>card.querySelector("h3")?.textContent.trim()===name)?.querySelector(".reward-image img");const previewSource=record.image||(source?source.src:"");if(previewSource)preview.src=previewSource;else preview.style.visibility="hidden";
+const label=document.createElement("div"),strong=document.createElement("strong");strong.textContent=name;label.appendChild(strong);const small=document.createElement("small");small.textContent=record.permanent===false?"Temporary item":"Permanent item";label.appendChild(small);editWrap.append(preview,label);nameCell.appendChild(editWrap);
+const priceCell=document.createElement("td");priceCell.textContent="⭐ "+item.price;const quantityCell=document.createElement("td"),input=document.createElement("input");input.type="number";input.min="0";input.step="1";input.value=qty(name);input.className="teacher-inventory-input";input.dataset.inventoryName=name;input.setAttribute("aria-label","Quantity for "+name);quantityCell.appendChild(input);
+const statusCell=document.createElement("td");statusCell.className=qty(name)===0?"inventory-status-out":"inventory-status-in";statusCell.textContent=qty(name)===0?"⚫ Out of Stock":"🟢 "+qty(name)+" available";
+const typeCell=document.createElement("td"),badge=document.createElement("span");badge.className="inventory-type-badge";badge.textContent=record.permanent===false?"Temporary":"Permanent";typeCell.appendChild(badge);if(record.permanent===false&&record.expiresAt){const exp=document.createElement("div");exp.className="inventory-expiry";exp.textContent="Expires "+record.expiresAt;typeCell.appendChild(exp);}
+const editCell=document.createElement("td"),edit=document.createElement("button");edit.type="button";edit.className="inventory-edit-button";edit.textContent="🖼️ Edit Item";edit.onclick=()=>openInventoryEditor(name);editCell.appendChild(edit);row.append(nameCell,priceCell,quantityCell,statusCell,typeCell,editCell);body.appendChild(row);});
 }
-
-        table=
-            $("teacherInventoryTable");
-
-
-        const refreshButton=
-            $("refreshInventory");
-
-
-        if(refreshButton){
-
-            refreshButton.onclick=
-                async()=>{
-
-                    refreshButton.disabled=
-                        true;
-
-                    await loadInventory();
-
-                    refreshButton.disabled=
-                        false;
-
-                    alert(
-                        "Inventory refreshed! 📦"
-                    );
-
-                };
-
-        }
-
-    }
-
-
-    if(!table)return;
-
-
-    ensureInventory();
-
-
-    const body=
-        $("teacherInventoryTableBody");
-
-
-    if(!body)return;
-
-
-    body.innerHTML="";
-
-
-    const items=
-        getStoreItems();
-
-
-    Object.entries(items)
-        .forEach(
-            ([name,item])=>{
-
-                const quantity=
-                    qty(name);
-
-
-                const row=
-                    document.createElement(
-                        "tr"
-                    );
-
-
-                if(quantity===0){
-
-                    row.classList.add(
-                        "inventory-empty-row"
-                    );
-
-                }
-
-
-                const nameCell=
-                    document.createElement(
-                        "td"
-                    );
-
-
-                nameCell.innerHTML=
-                    `
-                    <strong>
-                        ${name}
-                    </strong>
-                    `;
-
-
-                const priceCell=
-                    document.createElement(
-                        "td"
-                    );
-
-
-                priceCell.textContent=
-                    `⭐ ${item.price}`;
-
-
-                const quantityCell=
-                    document.createElement(
-                        "td"
-                    );
-
-
-                const input=
-                    document.createElement(
-                        "input"
-                    );
-
-
-                input.type=
-                    "number";
-
-
-                input.min=
-                    "0";
-
-
-                input.step=
-                    "1";
-
-
-                input.value=
-                    quantity;
-
-
-                input.className=
-                    "teacher-inventory-input";
-
-
-                input.setAttribute(
-                    "aria-label",
-                    `Quantity for ${name}`
-                );
-
-
-                quantityCell.appendChild(
-                    input
-                );
-
-
-                const statusCell=
-                    document.createElement(
-                        "td"
-                    );
-
-
-                statusCell.className=
-                    quantity===0
-                        ? "inventory-status-out"
-                        : "inventory-status-in";
-
-
-                statusCell.textContent=
-                    quantity===0
-                        ? "⚫ Out of Stock"
-                        : `🟢 ${quantity} available`;
-
-
-                const updateCell=
-                    document.createElement(
-                        "td"
-                    );
-
-
-                const saveButton=
-                    document.createElement(
-                        "button"
-                    );
-
-
-                saveButton.type=
-                    "button";
-
-
-                saveButton.className=
-                    "teacher-inventory-save";
-
-
-                saveButton.textContent=
-                    "💾 Save";
-
-
-                saveButton.onclick=
-                    async()=>{
-
-                        const newQuantity=
-                            Math.floor(
-                                Number(
-                                    input.value
-                                )
-                            );
-
-
-                        if(
-                            !Number.isFinite(
-                                newQuantity
-                            )||
-                            newQuantity<0
-                        ){
-
-                            alert(
-                                "Enter a whole number 0 or greater."
-                            );
-
-                            input.focus();
-
-                            return;
-
-                        }
-
-
-                        const oldQuantity=
-                            qty(name);
-
-
-                        inventory[name]=
-                            newQuantity;
-
-
-                        saveButton.disabled=
-                            true;
-
-
-                        saveButton.textContent=
-                            "⏳ Saving...";
-
-
-                        const saved=
-                            await saveInventory();
-
-
-                        saveButton.disabled=
-                            false;
-
-
-                        saveButton.textContent=
-                            "💾 Save";
-
-
-                        if(saved){
-
-                            updateShopAffordability();
-
-                            renderInventory();
-
-                        }else{
-
-                            inventory[name]=
-                                oldQuantity;
-
-
-                            alert(
-                                "⚠️ Inventory could not be saved online. Please try again."
-                            );
-
-
-                            renderInventory();
-
-                        }
-
-                    };
-
-
-                updateCell.appendChild(
-                    saveButton
-                );
-
-
-                row.append(
-                    nameCell,
-                    priceCell,
-                    quantityCell,
-                    statusCell,
-                    updateCell
-                );
-
-
-                body.appendChild(
-                    row
-                );
-
-            }
-        );
-
-}
+async function saveAllInventoryChanges(){const button=$("saveAllInventory"),status=$("inventorySaveStatus");if(!button)return;const pending={};for(const input of [...qa("#teacherInventoryTableBody .teacher-inventory-input")]){const value=Number(input.value);if(!Number.isInteger(value)||value<0){alert("Enter whole-number quantities of 0 or greater for every treasure.");input.focus();return;}pending[input.dataset.inventoryName]=value;}const previous={...inventory};Object.assign(inventory,pending);button.disabled=true;button.textContent="⏳ Saving...";if(status)status.textContent="";const saved=await saveInventory();button.disabled=false;button.textContent="💾 Save All Inventory";if(saved){saveLocal();if(status)status.textContent="✅ All quantities saved";updateShopAffordability();renderInventory();}else{inventory=previous;if(status)status.textContent="⚠️ Save failed";alert("Inventory could not be saved to Firebase. Previous quantities were restored.");renderInventory();}}
 
 /* =========================================
    RENDER TEACHER ORDERS TAB
@@ -5977,6 +5403,9 @@ if(closeTeacherDashboardButton){
 }
 
 
+const saveAllStudentsButton=$("saveAllStudents");
+if(saveAllStudentsButton)saveAllStudentsButton.addEventListener("click",saveAllStudentChanges);
+
 /* =========================================
    KEYBOARD TEACHER SHORTCUT
 ========================================= */
@@ -6137,6 +5566,8 @@ setupShopButtons();
 
 
     await loadStoreSettings();
+
+    await loadInventoryCatalog();
 
 await loadStudentRoster();
 
