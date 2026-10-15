@@ -2021,6 +2021,27 @@ button{
 }
 
 
+.teacher-inventory-stock-select{
+    width:100%;
+    min-width:140px;
+    max-width:190px;
+    min-height:44px;
+    padding:8px 10px;
+    border:2px solid #b9a0e8;
+    border-radius:10px;
+    background:#fff;
+    color:#4a347f;
+    font-family:'Fredoka',sans-serif;
+    font-size:15px;
+    font-weight:700;
+    cursor:pointer;
+}
+.teacher-inventory-stock-select:focus{
+    outline:none;
+    border-color:#7b3ff2;
+    box-shadow:0 0 0 3px rgba(123,63,242,.15);
+}
+
 .teacher-inventory-input:focus{
 
     outline:none;
