@@ -3181,7 +3181,7 @@ function setupShopButtons(){
         const card=button.closest(".reward-card");if(!card)return;
         const title=card.querySelector("h3"),priceText=card.querySelector("p");
         if(!title||!priceText)return;
-        const name=title.textContent.trim(),match=priceText.textContent.match(/\\d+/);
+        const name=title.textContent.trim(),match=priceText.textContent.match(/\d+/);
         if(!match)return;
         const price=Number(match[0]);if(qty(name)<=0)return;
         const existing=cartItems.findIndex(item=>item.name===name);
