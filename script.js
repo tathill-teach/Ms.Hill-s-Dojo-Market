@@ -2045,103 +2045,32 @@ function renderTeacherSettings(){
 ========================================= */
 
 function updateShopPrices(){
+    qa(".reward-card").forEach(card=>{
+        const title=card.querySelector("h3");
+        const priceText=card.querySelector("p");
+        const button=card.querySelector(".buy-btn");
+        if(!title||!priceText||!button)return;
 
-    qa(".reward-card")
-        .forEach(
-            card=>{
-
-                const title=
-                    card.querySelector(
-                        "h3"
-                    );
-
-                const priceText=
-                    card.querySelector(
-                        "p"
-                    );
-
-                const button=
-                    card.querySelector(
-                        ".buy-btn"
-                    );
-
-
-                if(
-                    !title||
-                    !priceText||
-                    !button
-                ){
-
-                    return;
-
-                }
-
-
-                const name=
-                    title.textContent.trim();
-
-
-                const defaultMatch=
-                    priceText.textContent.match(
-                        /\d+/
-                    );
-
-
-                const savedPrice=
-                    Number(
-                        storePrices[name]
-                    );
-
-
-                const regularPrice=
-        Number.isFinite(
-            savedPrice
-        )
+        const name=title.textContent.trim();
+        const defaultMatch=priceText.textContent.match(/\d+/);
+        const savedPrice=Number(storePrices[name]);
+        const regularPrice=Number.isFinite(savedPrice)
             ? savedPrice
-            : (
-                defaultMatch
-                    ? Number(defaultMatch[0])
-                    : 0
-            );
+            : (defaultMatch ? Number(defaultMatch[0]) : (Number(inventoryCatalog[name]?.price)||0));
+        const price=getEffectivePrice(name,regularPrice);
+        priceText.textContent=`⭐ ${price} Dojo Points`;
 
-    const price=
-        getEffectivePrice(
-            name,
-            regularPrice
-        );
+        // Always recompute button state; stale disabled states were preventing students
+        // from choosing items after stock, student points, or cart contents changed.
+        button.classList.remove("remove-item-button");
+        card.classList.remove("out-of-stock","cannot-afford");
+        button.disabled=false;
+        button.textContent="🛍️ Choose";
+    });
 
-
-                priceText.textContent=
-                    `⭐ ${price} Dojo Points`;
-
-
-                if(
-                    isManuallyOutOfStock(
-                        name
-                    )||
-                    qty(name)<=0
-                ){
-
-                    card.classList.add(
-                        "out-of-stock"
-                    );
-
-                    button.disabled=
-                        true;
-
-                    button.textContent=
-                        "Out of Stock";
-
-                }
-
-            }
-        );
-
-
+    renderDynamicInventoryCards();
     updateShopAffordability();
-
 }
-
 
 /* INVENTORY CATALOG: image customization and expiration */
 function isCatalogItemExpired(record){return !!(record&&(record.expired===true||(record.permanent===false&&record.expiresAt&&record.expiresAt<new Date().toISOString().slice(0,10))));}
