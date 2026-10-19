@@ -3172,62 +3172,65 @@ function updateShopAffordability(){
    SHOP BUTTONS
 ========================================= */
 
+// Global handler also supports inline/direct button wiring and avoids
+// relying on a delegated click listener for the reward cards.
+window.chooseDojoReward=function(button){
+    try{
+        const card=button?.closest(".reward-card");
+        const title=card?.querySelector("h3");
+        const priceText=card?.querySelector("p");
+        if(!card||!title)return;
+        if(currentStudentIndex===null||!students[currentStudentIndex]){
+            alert("Please log in as a student before choosing a reward.");
+            return;
+        }
+        const name=title.textContent.trim();
+        const match=priceText?.textContent.match(/\d+/);
+        const savedPrice=storePrices[name]??inventoryCatalog[name]?.price;
+        const price=match?Number(match[0]):Number(savedPrice);
+        if(!name||!Number.isFinite(price)||price<0){
+            alert("This reward's price could not be read. Please tell your teacher.");
+            return;
+        }
+        if(qty(name)<=0||isManuallyOutOfStock(name)){
+            alert("This reward is currently out of stock.");
+            updateShopAffordability();
+            return;
+        }
+        const existing=cartItems.findIndex(item=>item.name===name);
+        if(existing>=0)cartItems.splice(existing,1);
+        else{
+            if(getPointsRemaining()<price){
+                alert("You do not have enough Dojo Points for this reward.");
+                updateShopAffordability();
+                return;
+            }
+            cartItems.push({name,price});
+        }
+        updateCartDisplay();
+        updateShopAffordability();
+    }catch(error){
+        console.error("Dojo Mart reward selection failed:",error);
+        alert("Dojo Mart could not add that reward. Please refresh the page and try again.");
+    }
+};
+
 function setupShopButtons(){
     if(!shopScreen)return;
-
-    // Use direct button handlers so selection does not depend on event bubbling
-    // or whether a reward card was inserted before or after shop initialization.
     const bindButtons=()=>{
         qa("#shopScreen .buy-btn").forEach(button=>{
-            if(button.dataset.cartHandlerBound==="true")return;
-            button.dataset.cartHandlerBound="true";
-            button.addEventListener("click",event=>{
+            // Assign the click property directly, replacing any stale handler.
+            button.onclick=function(event){
                 event.preventDefault();
-                event.stopPropagation();
-                const card=button.closest(".reward-card");
-                const title=card?.querySelector("h3");
-                const priceText=card?.querySelector("p");
-                if(!card||!title)return;
-                if(currentStudentIndex===null||!students[currentStudentIndex]){
-                    alert("Please log in as a student before choosing a reward.");
-                    return;
-                }
-
-                const name=title.textContent.trim();
-                const displayedMatch=priceText?.textContent.match(/\d+/);
-                const savedPrice=storePrices[name]??inventoryCatalog[name]?.price;
-                const price=displayedMatch?Number(displayedMatch[0]):Number(savedPrice);
-                if(!name||!Number.isFinite(price)||price<0){
-                    alert("This reward's price could not be read. Please tell your teacher.");
-                    return;
-                }
-                if(qty(name)<=0||isManuallyOutOfStock(name)){
-                    alert("This reward is currently out of stock.");
-                    updateShopAffordability();
-                    return;
-                }
-
-                const existing=cartItems.findIndex(item=>item.name===name);
-                if(existing>=0){
-                    cartItems.splice(existing,1);
-                }else{
-                    if(getPointsRemaining()<price){
-                        alert("You do not have enough Dojo Points for this reward.");
-                        updateShopAffordability();
-                        return;
-                    }
-                    cartItems.push({name,price});
-                }
-                updateCartDisplay();
-                updateShopAffordability();
-            });
+                window.chooseDojoReward(button);
+            };
         });
     };
-
     bindButtons();
-    // Dynamic inventory cards can be rebuilt after Firebase loads or settings change.
-    const observer=new MutationObserver(()=>bindButtons());
-    observer.observe(shopScreen,{childList:true,subtree:true});
+    if(!shopScreen.dataset.shopButtonObserverBound){
+        shopScreen.dataset.shopButtonObserverBound="true";
+        new MutationObserver(bindButtons).observe(shopScreen,{childList:true,subtree:true});
+    }
 }
 
 
