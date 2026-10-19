@@ -3173,21 +3173,46 @@ function updateShopAffordability(){
 ========================================= */
 
 function setupShopButtons(){
-    if(!shopScreen||shopScreen.dataset.shopButtonsBound)return;
-    shopScreen.dataset.shopButtonsBound="true";
-    shopScreen.addEventListener("click",event=>{
+    // Bind once at the document level so reward cards still work if the shop
+    // screen or its inventory cards are rebuilt dynamically.
+    if(document.documentElement.dataset.shopButtonsBound==="true")return;
+    document.documentElement.dataset.shopButtonsBound="true";
+    document.addEventListener("click",event=>{
         const button=event.target.closest(".buy-btn");
-        if(!button||!shopScreen.contains(button)||currentStudentIndex===null)return;
+        if(!button||!shopScreen||!shopScreen.contains(button))return;
         const card=button.closest(".reward-card");if(!card)return;
+        if(currentStudentIndex===null||!students[currentStudentIndex]){
+            alert("Please log in as a student before choosing a reward.");
+            return;
+        }
         const title=card.querySelector("h3"),priceText=card.querySelector("p");
-        if(!title||!priceText)return;
-        const name=title.textContent.trim(),match=priceText.textContent.match(/\d+/);
-        if(!match)return;
-        const price=Number(match[0]);if(qty(name)<=0)return;
+        if(!title)return;
+        const name=title.textContent.trim();
+        const match=priceText?.textContent.match(/\d+/);
+        const catalogPrice=Number(storePrices[name]??inventoryCatalog[name]?.price);
+        const price=match?Number(match[0]):catalogPrice;
+        if(!name||!Number.isFinite(price)||price<0){
+            console.error("Could not read reward name or price:",{name,priceText:priceText?.textContent});
+            alert("This reward's price could not be read. Please tell your teacher.");
+            return;
+        }
+        if(qty(name)<=0||isManuallyOutOfStock(name)){
+            alert("This reward is currently out of stock.");
+            updateShopAffordability();
+            return;
+        }
         const existing=cartItems.findIndex(item=>item.name===name);
-        if(existing!==-1)cartItems.splice(existing,1);
-        else{if(getPointsRemaining()<price)return;cartItems.push({name,price});}
-        updateCartDisplay();updateShopAffordability();
+        if(existing!==-1){
+            cartItems.splice(existing,1);
+        }else{
+            if(getPointsRemaining()<price){
+                alert("You do not have enough Dojo Points for this reward.");
+                return;
+            }
+            cartItems.push({name,price});
+        }
+        updateCartDisplay();
+        updateShopAffordability();
     });
 }
 
