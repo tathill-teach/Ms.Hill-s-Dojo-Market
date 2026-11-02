@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#19002f">
+  <title>Our Classroom Election</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="election.css">
+</head>
+<body>
+  <main class="election-page">
+    <section class="election-stage" aria-label="Classroom election. Choose your name.">
+      <div class="election-artboard">
+        <img
+          class="election-artwork"
+          src="assets/images/classroom-election-screen-one.jpg"
+          alt="Our Classroom Election: Dance Party versus Art Party. Find your name."
+          draggable="false"
+        >
+        <div class="name-hotspots" role="group" aria-label="Choose your name">
+          <button class="name-hit left row-1" type="button" data-student="Casper Kamali" aria-label="Select Casper Kamali" aria-pressed="false"></button>
+          <button class="name-hit left row-2" type="button" data-student="Eleanor Pelletier" aria-label="Select Eleanor Pelletier" aria-pressed="false"></button>
+          <button class="name-hit left row-3" type="button" data-student="Eli Hamilton" aria-label="Select Eli Hamilton" aria-pressed="false"></button>
+          <button class="name-hit left row-4" type="button" data-student="Eliana Ayala" aria-label="Select Eliana Ayala" aria-pressed="false"></button>
+          <button class="name-hit left row-5" type="button" data-student="Elise Arrieta" aria-label="Select Elise Arrieta" aria-pressed="false"></button>
+          <button class="name-hit left row-6" type="button" data-student="Guhan Aroul" aria-label="Select Guhan Aroul" aria-pressed="false"></button>
+          <button class="name-hit left row-7" type="button" data-student="James Leibarth" aria-label="Select James Leibarth" aria-pressed="false"></button>
+
+          <button class="name-hit right row-1" type="button" data-student="James Selkirk" aria-label="Select James Selkirk" aria-pressed="false"></button>
+          <button class="name-hit right row-2" type="button" data-student="Jenna Jonson" aria-label="Select Jenna Jonson" aria-pressed="false"></button>
+          <button class="name-hit right row-3" type="button" data-student="Lucy Hammer" aria-label="Select Lucy Hammer" aria-pressed="false"></button>
+          <button class="name-hit right row-4" type="button" data-student="Nicholas Luna" aria-label="Select Nicholas Luna" aria-pressed="false"></button>
+          <button class="name-hit right row-5" type="button" data-student="Owen Alspach" aria-label="Select Owen Alspach" aria-pressed="false"></button>
+          <button class="name-hit right row-6" type="button" data-student="Ruby Rodriguez" aria-label="Select Ruby Rodriguez" aria-pressed="false"></button>
+          <button class="name-hit right row-7" type="button" data-student="Zedek Lobo" aria-label="Select Zedek Lobo" aria-pressed="false"></button>
+        </div>
+      </div>
+      <p class="screen-reader-status" id="selectionStatus" role="status" aria-live="polite"></p>
+    </section>
+  </main>
+  <script src="election.js" defer></script>
+</body>
+</html>
