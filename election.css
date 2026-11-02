@@ -1,0 +1,145 @@
+:root {
+  color-scheme: dark;
+  font-family: "Fredoka", system-ui, sans-serif;
+  background: #10001f;
+}
+
+* { box-sizing: border-box; }
+
+html, body {
+  width: 100%;
+  min-height: 100%;
+  margin: 0;
+}
+
+body {
+  min-height: 100vh;
+  min-height: 100svh;
+  overflow-x: hidden;
+  background:
+    radial-gradient(ellipse at 50% 8%, rgba(122, 23, 255, .38), transparent 46%),
+    radial-gradient(ellipse at 10% 80%, rgba(0, 221, 255, .18), transparent 34%),
+    radial-gradient(ellipse at 92% 80%, rgba(255, 0, 183, .2), transparent 36%),
+    #10001f;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.election-page {
+  min-height: 100vh;
+  min-height: 100svh;
+  display: grid;
+  place-items: center;
+  padding: 0;
+}
+
+.election-stage {
+  width: 100%;
+  display: grid;
+  place-items: center;
+}
+
+.election-artboard {
+  position: relative;
+  width: min(100vw, 177.58svh, 1671px);
+  aspect-ratio: 1671 / 941;
+  overflow: hidden;
+  isolation: isolate;
+  box-shadow: 0 0 70px rgba(192, 31, 255, .26);
+}
+
+.election-artwork {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: fill;
+  user-select: none;
+  pointer-events: none;
+}
+
+.name-hotspots {
+  position: absolute;
+  inset: 0;
+}
+
+.name-hit {
+  position: absolute;
+  display: block;
+  padding: 0;
+  border: 0;
+  border-radius: 999px;
+  background: transparent;
+  cursor: pointer;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+  transition: box-shadow .14s ease, background-color .14s ease, transform .14s ease;
+}
+
+/* The artwork contains the visible name buttons. These transparent hit areas
+   sit directly over them so the approved illustration remains unchanged. */
+.name-hit.left {
+  left: 16.6%;
+  width: 32.0%;
+}
+
+.name-hit.right {
+  left: 50.2%;
+  width: 33.8%;
+}
+
+.name-hit.row-1 { top: 41.9%; height: 7.0%; }
+.name-hit.row-2 { top: 48.9%; height: 7.0%; }
+.name-hit.row-3 { top: 55.9%; height: 7.0%; }
+.name-hit.row-4 { top: 62.9%; height: 7.0%; }
+.name-hit.row-5 { top: 69.9%; height: 7.0%; }
+.name-hit.row-6 { top: 76.9%; height: 7.0%; }
+.name-hit.row-7 { top: 83.9%; height: 7.0%; }
+
+.name-hit:hover,
+.name-hit:focus-visible {
+  outline: none;
+  box-shadow:
+    inset 0 0 0 4px rgba(255,255,255,.98),
+    0 0 0 3px rgba(0, 229, 255, .95),
+    0 0 22px 7px rgba(255, 38, 218, .8);
+  background: rgba(255,255,255,.08);
+}
+
+.name-hit.is-selected {
+  box-shadow:
+    inset 0 0 0 5px #fff,
+    0 0 0 4px #ffe14d,
+    0 0 25px 9px rgba(255, 205, 35, .95);
+  background: rgba(255, 255, 255, .13);
+  transform: scale(.985);
+}
+
+.screen-reader-status {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+@media (max-width: 700px) {
+  .election-page {
+    display: block;
+    overflow-x: auto;
+  }
+  .election-stage {
+    width: 100%;
+    min-width: 640px;
+  }
+  .election-artboard {
+    width: 100%;
+    min-width: 640px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .name-hit { transition: none; }
+}
