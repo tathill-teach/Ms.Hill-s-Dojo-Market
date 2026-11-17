@@ -1279,14 +1279,14 @@ async function saveStoreSettings(){
 
     saveLocal();
 
-
+    /*
+       Always serialize treasure names before writing.
+       Firebase rejects keys containing . # $ [ ] or /.
+       buildStoreSettingsPayload encodes those names safely.
+    */
     return await firebasePut(
         "storeSettings",
-        {
-            prices:storePrices,
-            outOfStock:storeOutOfStock,
-            specialPrices:storeSpecialPrices
-        }
+        buildStoreSettingsPayload()
     );
 
 }
