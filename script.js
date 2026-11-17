@@ -3891,6 +3891,26 @@ function showReceipt(){
             </div>
 
 
+            <button
+                id="receiptReturnButton"
+                type="button"
+                style="
+                    margin-top:28px;
+                    padding:16px 28px;
+                    border:0;
+                    border-radius:16px;
+                    background:#5936a3;
+                    color:white;
+                    font-family:Fredoka,sans-serif;
+                    font-size:20px;
+                    font-weight:700;
+                    cursor:pointer;
+                    box-shadow:0 4px 10px rgba(0,0,0,.18);
+                "
+            >
+                ↩️ Return to Student Selection
+            </button>
+
             <div style="
                 margin-top:25px;
                 color:#5936a3;
@@ -3913,6 +3933,17 @@ function showReceipt(){
     showScreen(
         receiptScreen
     );
+
+    const returnButton=document.getElementById("receiptReturnButton");
+    if(returnButton){
+        returnButton.onclick=()=>{
+            cartItems=[];
+            currentStudentIndex=null;
+            if(cartPanel)cartPanel.classList.add("hidden-cart");
+            hideScreen(receiptScreen);
+            showScreen(studentScreen);
+        };
+    }
 
 }
 
