@@ -2383,6 +2383,59 @@ async function savePoints(index){
 
 
 /* =========================================
+   ONE-TIME TREASURE BOX POINT UPDATE
+========================================= */
+
+async function applyTreasureBoxPointUpdate(){
+    const migrationKey="treasureBoxPointUpdate20261117";
+    const alreadyApplied=await firebaseGet("appMigrations/"+migrationKey);
+    if(alreadyApplied===true)return;
+
+    const updatedPoints={
+        "Lucy Hammer":104,
+        "James Selkirk":50,
+        "Jenna Jonson":49,
+        "Owen Alspach":60,
+        "Nicholas Luna":59,
+        "Guhan Aroul":66,
+        "James Leibarth":78,
+        "Ruby Rodriguez":50,
+        "Zedek Lobo":84,
+        "Eleanor Pelletier":53,
+        "Eli Hamilton":74,
+        "Eliana Ayala":109,
+        "Elise Arrieta":76,
+        "Casper Kamali":100
+    };
+
+    let changed=0;
+    students.forEach(student=>{
+        if(Object.prototype.hasOwnProperty.call(updatedPoints,student.name)){
+            student.points=updatedPoints[student.name];
+            changed++;
+        }
+    });
+
+    if(changed!==Object.keys(updatedPoints).length){
+        console.error("Treasure Box point update paused: expected 14 named students, found",changed);
+        return;
+    }
+
+    saveLocal();
+    const rosterSaved=await saveStudentRoster();
+    const pointResults=await Promise.all(students.map((student,index)=>savePoints(index)));
+    if(rosterSaved&&pointResults.every(Boolean)){
+        await firebasePut("appMigrations/"+migrationKey,true);
+        renderStudentGrid();
+        renderTeacherTable();
+        renderTeacherRoster();
+        console.log("Treasure Box points updated for 14 students.");
+    }else{
+        console.error("Treasure Box point update did not complete. Firebase save failed.");
+    }
+}
+
+/* =========================================
    REFRESH EVERYTHING
 ========================================= */
 
@@ -5440,6 +5493,8 @@ setupShopButtons();
 await loadStudentRoster();
 
     await refreshAll();
+
+    await applyTreasureBoxPointUpdate();
 
 updateShopPrices();
 
